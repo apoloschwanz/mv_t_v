@@ -1,8 +1,9 @@
 <?php
 
+require_once 'clase_entidadj.php' ;
 require_once 'clase_gestion_tipo.php' ;
 
-class escuelas_general extends Entidadi  {
+class escuelas_general extends entidadj {
 	
 	
  		protected function Pone_Datos_Fijos_No_Heredables()
@@ -16,24 +17,25 @@ class escuelas_general extends Entidadi  {
 			// tipos:  'pk' 'fk' 'otro' 'date' 'datetime' 'time' 'number' 'email' 'url' 'password'
 			//								el tipo 'fk' espera que se defina una clase 
 			$this->lista_campos_lista=array();
-			$this->lista_campos_lista[]=array( 'nombre'=>'CUE' 			, 'tipo'=>'pk' 		, 'descripcion'=>'Codigo Estab.' , 'clase'=>NULL ) ;
-			$this->lista_campos_lista[]=array( 'nombre'=>'CUE' 			, 'tipo'=>'pk' 		, 'descripcion'=>'Codigo Estab.' , 'clase'=>NULL ) ;
-			$this->lista_campos_lista[]=array( 'nombre'=>'CUE' 			, 'tipo'=>'pk' 		, 'descripcion'=>'Codigo Estab.' , 'clase'=>NULL ) ;
-			$this->lista_campos_lista[]=array( 'nombre'=>'NOMBRE' 	, 'tipo'=>'text' 	, 'descripcion'=>'Establecimiento' , 'clase'=>NULL ) ;
-			$this->lista_campos_lista[]=array( 'nombre'=>'DOMICILIO' 	, 'tipo'=>'text' 	, 'descripcion'=>'Direccion' , 'clase'=>NULL ) ;
-			$this->lista_campos_lista[]=array( 'nombre'=>'TELEFONO' 	, 'tipo'=>'text' 	, 'descripcion'=>'Teléfono' , 'clase'=>NULL ) ;
-			$this->lista_campos_lista[]=array( 'nombre'=>'Gestion_Tipo' 	, 'tipo'=>'text' 	, 'descripcion'=>'Gestión' , 'clase'=>NULL ) ;
+			
+			$this->lista_campos_lista[]=new campo_entidad( 'CUE' 			, 'pk' 		, 'Codigo Estab.' , NULL ,true) ;
+			$this->lista_campos_lista[]=new campo_entidad( 'NOMBRE' 	, 'text' 	, 'Establecimiento'  ) ;
+			$this->lista_campos_lista[1]->pone_busqueda() ;
+			$this->lista_campos_lista[]=new campo_entidad( 'DOMICILIO' 	, 'text' 	, 'Direccion'  ) ;
+			$this->lista_campos_lista[2]->pone_busqueda() ;
+			$this->lista_campos_lista[]=new campo_entidad( 'TELEFONO' 	, 'text' 	, 'Teléfono'  ) ;
+			$this->lista_campos_lista[]=new campo_entidad( 'Gestion_Tipo' 	, 'text' 	, 'Gestión'  ) ;
 			//
 			//
 			$this->lista_campos_lectura=array();
-			$this->lista_campos_lectura[]=array( 'nombre'=>'CUE' 			, 'tipo'=>'pk' 		, 'descripcion'=>'Codigo Estab.' , 'clase'=>NULL ) ;
-			$this->lista_campos_lectura[]=array( 'nombre'=>'NOMBRE' 	, 'tipo'=>'text' 	, 'descripcion'=>'Establecimiento' , 'clase'=>NULL ) ;
-			$this->lista_campos_lectura[]=array( 'nombre'=>'DOMICILIO' 	, 'tipo'=>'text' 	, 'descripcion'=>'Direccion' , 'clase'=>NULL ) ;
-			$this->lista_campos_lectura[]=array( 'nombre'=>'TELEFONO' 	, 'tipo'=>'text' 	, 'descripcion'=>'Teléfono' , 'clase'=>NULL ) ;
-			$this->lista_campos_lectura[]=array( 'nombre'=>'Gestion_Tipo' 	, 'tipo'=>'fk' 	, 'descripcion'=>'Gestión' , 'clase'=>new gestion_tipo() ) ;
-			$this->lista_campos_lectura[]=array( 'nombre'=>'DEPENDENCIA_FUNCIONAL' 	, 'tipo'=>'text' 	, 'descripcion'=>'Dependencia Funcional' , 'clase'=>NULL ) ;
-			$this->lista_campos_lectura[]=array( 'nombre'=>'Escuela_Ofertas' 	, 'tipo'=>'text' 	, 'descripcion'=>'Ofertas' , 'clase'=>NULL ) ;
-			$this->lista_campos_lectura[]=array( 'nombre'=>'Escuela_Observaciones' 	, 'tipo'=>'textarea' 	, 'descripcion'=>'Observaciones' , 'clase'=>NULL ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'CUE' 			, 'pk' 		, 'Codigo Estab.'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'NOMBRE' 	, 'text' 	, 'Establecimiento'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'DOMICILIO' 	, 'text' 	, 'Direccion'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'TELEFONO' 	, 'text' 	, 'Teléfono'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'Gestion_Tipo' 	, 'fk' 	, 'Gestión' , new gestion_tipo() ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'DEPENDENCIA_FUNCIONAL' 	, 'text' 	, 'Dependencia Funcional'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'Escuela_Ofertas' 	, 'text' 	, 'Ofertas'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'Escuela_Observaciones' 	, 'textarea' 	, 'Observaciones'  ) ;
 			//
 			// Nombre de la tabla
 			$this->nombre_tabla = "Establecimientos" ;
@@ -56,7 +58,6 @@ class escuelas_general extends Entidadi  {
 			//
 			// Filtros
 			$this->con_filtro_fecha = false;
-			$this->con_filtro_general = true;
 			//
 			//
 		}	
