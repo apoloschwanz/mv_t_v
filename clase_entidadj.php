@@ -39,8 +39,10 @@ class entidadj {
 	protected $okGrabar  ;
 	protected $okReleer  ;
 	protected $okSalir ;
-	protected $botones_extra_edicion ;
+	protected $okVer ;
+	protected $okAgregar ;
 	public $okExportar ;
+	protected $botones_extra_edicion ;
 /////////////////////////////////////-------- variables de la clase entidad --------- //////////////////////////////////
 	protected $strsql ;
 	protected $desde ;
@@ -70,7 +72,8 @@ class entidadj {
 	protected $acciones;
 	protected $accion_ok;
 	protected $accion_especial_seleccionada;
-	protected $existe ;										
+	protected $existe ;			
+	protected $clave_manual;							
 /////////////////////////////////////-------- variables de la clase entidad --------- //////////////////////////////////
   // by DZ 2016-01-22 - protected $lista_campos_descrip ;																
 	// by DZ 2016-01-22 - sacar ---- protected $lista_campos_tipo ;																	
@@ -85,6 +88,7 @@ class entidadj {
 			//
 			// tipos:  'pk' 'fk' 'otro' 'date' 'datetime' 'time' 'number' 'email' 'url' 'password'
 			//								el tipo 'fk' espera que se defina una clase 
+			$this->clave_manual_activar();
 			$this->lista_campos_lista=array();
 			$this->lista_campos_lista[]=array( 'nombre'=>'id' 			, 'tipo'=>'pk' 		, 'descripcion'=>'Identificador' , 'clase'=>NULL ) ;
 			$this->lista_campos_lista[]=array( 'nombre'=>'descrip' 	, 'tipo'=>'text' 	, 'descripcion'=>'Identificador' , 'clase'=>NULL ) ;
@@ -125,6 +129,10 @@ class entidadj {
 			//
 			//
 		}
+	protected function clave_manual_activar()
+	{
+		$this->clave_manual = true ;
+	}
 	protected function existe()
 	{
 		return $this->existe ;
@@ -152,6 +160,7 @@ class entidadj {
 			$this->lista_detalle = array() ;
 			$this->tiene_lista_detalle = false ; // se activa en rutina de lista detalle
 			$this->lista_detalle_enc_columnas = array();
+			$this->clave_manual = false ; // se activa en $this->clave_manual_activar() ;
 			//
 			// Personalizacion de variables
 			$this->Pone_Datos_Fijos_No_Heredables() ; // by DZ 2016-10-11
@@ -161,8 +170,11 @@ class entidadj {
 			$this->okReleer= $this->prefijo_campo. '_okReleer';
 			$this->okGrabar= $this->prefijo_campo. '_okGrabar';
 			$this->okModificar=$this->prefijo_campo. '_okModificar';
+			$this->okAgregar=$this->prefijo_campo. '_okAgregar';
+			$this->okVer=$this->prefijo_campo. '_okVer';
 			$this->okGrabaAgregar= $this->prefijo_campo. '_okGrabaAgregar';
 			$this->okExportar = $this->prefijo_campo. '_okExportar' ;
+			
 			//
 			// Personalizacion de variables
 			// by DZ 2015-08-15 $this->Pone_Datos_Fijos_No_Heredables() ; 									// by DZ 2015-08-14 - agregado lista de datos
@@ -284,22 +296,25 @@ class entidadj {
 								{
 									$txt=$txt.'<tr>';
 									$txt=$txt.'<td>';
-								  $txt=$txt.$this->lista_campos_lectura[$i]['descripcion'];
+								  //$txt=$txt.$this->lista_campos_lectura[$i]['descripcion'];
+								  $txt.= $this->lista_campos_lectura[$i]->descripcion() ;
 								  $txt=$txt.'</td>';
 									$cpo->pone_nombre( $this->prefijo_campo.'cpoNro'.$i.'_' ) ;
 									$cpo->pone_valor( $reg[$i] ) ;
-									if( $this->lista_campos_lectura[$i]['tipo'] == 'pk' or $this->lista_campos_lectura[$i]['tipo'] == 'otro' )
+									if( $this->lista_campos_lectura[$i]->tipo() == 'pk' or $this->lista_campos_lectura[$i]->tipo() == 'otro' )
 										{ 
 											$cpo->pone_tipo( 'text' ) ;
 											$txt = $txt.$cpo->txtMostrarEtiqueta() ;
 										}
-									elseif( $this->lista_campos_lectura[$i]['tipo'] == 'fk' )
+									elseif( $this->lista_campos_lectura[$i]->tipo() == 'fk' )
 										{
 											//
 											// Lista de fk
 											//
 											$cpo->pone_tipo( 'select' ) ;
-											$lista_fk = $this->lista_campos_lectura[$i]['clase']->Obtener_Lista() ;
+											$to_objeto_campo = $this->lista_campos_lectura[$i]->objeto() ;
+											$lista_fk = $to_objeto_campo->Obtener_Lista() ;
+											// by DZ 2016-10-25 $lista_fk = $this->lista_campos_lectura[$i]['clase']->Obtener_Lista() ;
 											$cpo->pone_lista( $lista_fk ) ;
 											$cpo->pone_posicion_codigo( 0 ) ;
 											$cpo->pone_posicion_descrip( 1 ) ;
@@ -308,7 +323,7 @@ class entidadj {
 										}
 									else
 										{ 
-											$cpo->pone_tipo( $this->lista_campos_lectura[$i]['tipo'] ) ;
+											$cpo->pone_tipo( $this->lista_campos_lectura[$i]->tipo() ) ;
 											$txt = $txt.$cpo->txtMostrarParaModificar() ;
 											//$txt=$txt.'<input type="'.$this->lista_campos_tipo[$i].'" name="'.$nom_campo.'" value="'.$reg[$i].'">';
 											//$txt=$txt.'</td>';
@@ -416,26 +431,32 @@ class entidadj {
 			//
 			// Abre tabla
 			$txt = '<table>';
-			for($i=1;$i<count($this->lista_campos_lectura);$i++)
+			for($i=0;$i<count($this->lista_campos_lectura);$i++)
 				{
 					$txt=$txt.'<tr>';
 					$txt=$txt.'<td>';
-				  $txt=$txt.$this->lista_campos_lectura[$i]['descripcion'];
+				  $txt=$txt.$this->lista_campos_lectura[$i]->descripcion();
 				  $txt=$txt.'</td>';
 					$cpo->pone_nombre( $this->prefijo_campo.'cpoNro'.$i.'_' ) ;
 					$cpo->pone_valor( '' ) ;
-					if( $this->lista_campos_lectura[$i]['tipo'] == 'pk' or $this->lista_campos_lectura[$i]['tipo'] == 'otro' )
+					if( $this->lista_campos_lectura[$i]->tipo() == 'pk' )
+					{
+						$cpo->pone_valor( 'nuevo' );
+						$cpo->pone_tipo( 'text' ) ;
+						$txt = $txt.$cpo->txtMostrarEtiqueta() ;
+					}
+					elseif( $this->lista_campos_lectura[$i]->tipo() == 'otro' )
 						{ 
-							//$cpo->pone_tipo( 'text' ) ;
-							//$txt = $txt.$cpo->txtMostrarEtiqueta() ;
+							$cpo->pone_tipo( 'text' ) ;
+							$txt = $txt.$cpo->txtMostrarEtiqueta() ;
 						}
-					elseif( $this->lista_campos_lectura[$i]['tipo'] == 'fk' )
+					elseif( $this->lista_campos_lectura[$i]->tipo() == 'fk' )
 						{
 							//
 							// Lista de fk
 							//
 							$cpo->pone_tipo( 'select' ) ;
-							$lista_fk = $this->lista_campos_lectura[$i]['clase']->Obtener_Lista() ;
+							$lista_fk = $this->lista_campos_lectura[$i]->objeto()->Obtener_Lista() ;
 							$cpo->pone_lista( $lista_fk ) ;
 							$cpo->pone_posicion_codigo( 0 ) ;
 							$cpo->pone_posicion_descrip( 1 ) ;
@@ -444,7 +465,7 @@ class entidadj {
 						}
 					else
 						{ 
-							$cpo->pone_tipo( $this->lista_campos_lectura[$i]['tipo'] ) ;
+							$cpo->pone_tipo( $this->lista_campos_lectura[$i]->tipo() ) ;
 							$txt = $txt.$cpo->txtMostrarParaModificar() ;
 							//$txt=$txt.'<input type="'.$this->lista_campos_tipo[$i].'" name="'.$nom_campo.'" value="'.$reg[$i].'">';
 							//$txt=$txt.'</td>';
@@ -476,7 +497,7 @@ class entidadj {
 				{
 					//
 					// tipo de campo
-					$tp = $campo['tipo'] ;
+					$tp = $campo->tipo() ;
 					//
 					// tipos de camos validos
 					if ( $tp != 'otro' and $tp != 'pk' )
@@ -502,7 +523,7 @@ class entidadj {
 						else $valor = $_POST[$nomCtrl] ;
 						//
 						// Lista campos
-						$lst_cmp = $lst_cmp. $campo['nombre'] ;
+						$lst_cmp = $lst_cmp. $campo->nombre() ;
 						//
 						// Lista valores
 						$lst_val = $lst_val."'".$valor."'" ;
@@ -593,6 +614,18 @@ class entidadj {
 			header('Location: '.$ts_location);
 
 		}
+		protected function mostrar_alta()
+		{
+			$botones = '<input type="submit" name="'.$this->okSalir.'" value="Salir" autofocus>';
+			$botones .= '<input type="submit" name="'.$this->okReleer.'" value="Revertir" >';
+			$botones .= '<input type="submit" name="'.$this->okGrabaAgregar.'" value="Agregar" >';
+			$pagina=new Paginai($this->pagina_titulo,$botones);
+			$txt = 	$this->texto_agregar();
+			$pagina->insertarCuerpo($txt);
+			$pagina->sinborde();
+			$pagina->graficar_c_form($_SERVER['PHP_SELF']);
+				
+		}
 		protected function mostrar_edicion()
 		{
 			//
@@ -644,17 +677,25 @@ class entidadj {
 			}
 			//
 			// Acciones Clasicas 
-			$okVer = $this->obtiene_prefijo_campo().'okVer' ;
+			
+			/* by dz 2016-10-25 $okVer = $this->obtiene_prefijo_campo().'okVer' ;
 			$okModificar = $this->obtiene_prefijo_campo().'okModificar' ;
 			$okagregar = $this->obtiene_prefijo_campo().'_okAgregar' ;
 			$okborrar  = $this->obtiene_prefijo_campo().'_okBorrar' ;
+			*/
 			//
 			//
 			if ( $this->accion_especial_seleccionada )
 			{
 				$this->maneja_evento_accion_especial();
 			}
-			elseif ( isset($_GET[$okModificar]) )
+			// Agregar
+			elseif ( isset($_POST[$this->okAgregar]) )
+			{
+				$this->mostrar_alta();
+			}
+			// Modificar
+			elseif ( isset($_GET[$this->okModificar]) )
 			{
 				//
 				// Edita
@@ -676,9 +717,11 @@ class entidadj {
 				if ( $this->hay_error() == true ) $this->muestra_error() ;
 				else $this->muestra_ok('Registro # '.$this->id().' actualizado') ;
 			}
-			elseif ( isset($_REQUEST['okSalir'] ) )
+			elseif ( isset( $_POST[$this->okGrabaAgregar] ) )
 			{
-				$this->ok_Salir() ;
+				$this->texto_agregar_okGrabar();
+				if ( $this->hay_error() == true ) $this->muestra_error() ;
+				else $this->muestra_ok('Registro # '.$this->id().' agregado') ;
 			}
 			else
 			{
@@ -875,11 +918,11 @@ class entidadj {
 		if ( $tf_primero )
 		{
 			$tf_primero = false;
-			$ts_pk = $campo['nombre'] ;
+			$ts_pk = $campo->nombre() ;
 		}
 		else
 			$this->strsql .= ' , ';
-		$this->strsql .= $campo['nombre'] ;
+		$this->strsql .= $campo->nombre() ;
 	}
 	$this->strsql .= ' FROM '.$this->nombre_fisico_tabla. ' ' ;
 	$this->strsql .= ' WHERE '.$ts_pk." = '" .$this->id."' " ;
@@ -901,6 +944,7 @@ class entidadj {
 	{
 		$this->strsql = ' SELECT ' ;
 		$tf_primero = true ;
+		$tf_filtra_por_codigo = false ;
 		foreach ( $this->lista_campos_lista as $campo )
 		{
 			if ( $tf_primero )
@@ -911,36 +955,48 @@ class entidadj {
 			else
 				$this->strsql .= ' , ';
 			$this->strsql .= $campo->nombre(); // by dz 2016-10-24  $campo['nombre'] ;
+			//
+			// PK
+			if ( $campo->tipo() == 'pk' )
+			{
+				if ( $campo->busqueda() == true and ! empty( $this->filtro_id) ) 
+					$tf_filtra_por_codigo = true ;
+			}
 		}
+		
 		$this->strsql .= ' FROM '.$this->nombre_fisico_tabla. ' ' ;
 		// by dz 2016-10-24
 		// -->
-		
+		if ( $tf_filtra_por_codigo ) 
+		{
+			$ts_where = ' WHERE ' ;
+			$ts_where .= $ts_pk . ' = '." '".$this->filtro_id."' " ;
+			$this->strsql .= $ts_where ;
+		}
 		//
 		// Filtro por campos de búsqueda
-		$tn_campos_busqueda = 0 ;
-		$ts_where = '' ;
-		foreach( $this->lista_campos_lista as $campo )
+		if ( ! empty( $this->filtro_gral ) and ! $tf_filtra_por_codigo)
 		{
-			if($campo->busqueda() )
+			$tn_campos_busqueda = 0 ;
+			$ts_where = ' WHERE ' ;
+			foreach( $this->lista_campos_lista as $campo )
 			{
-				 $tn_campos_busqueda ++ ;
-				 if ( $tn_campos_busqueda > 1 )
-					$ts_where .= 'or ' ;
-				 $ts_where .= $campo->nombre() ;
-				 $ts_where .= ' LIKE ' ;
-				 $ts_where .= " '" .$this->filtro_gral. "' " ;
-				 
+				if($campo->busqueda() )
+				{
+					 $tn_campos_busqueda ++ ;
+					 if ( $tn_campos_busqueda > 1 )
+						$ts_where .= ' or ' ;
+					 $ts_where .= $campo->nombre() ;
+					 $ts_where .= ' LIKE ' ;
+					 $ts_where .= " '%" .$this->filtro_gral. "%' " ;
+					 
+				}
+			}
+			if( $tn_campos_busqueda > 0 )
+			{
+				$this->strsql .= $ts_where ;
 			}
 		}
-		if( $tn_campos_busqueda > 0 )
-		{
-			echo ' tiene una cantidad de campos de busqueda de : ' . $tn_campos_busqueda ;
-			echo '<br>' ;
-			echo ' y su where es : '.$ts_where ;
-			echo '<br>' ;
-		}
-		
 		// <--
 		// by dz 2016-10-24
 	}
@@ -1209,7 +1265,7 @@ class entidadj {
 					if( $to_campo->mostrar() )
 					{
 						$txt .= '<th>' ;
-						$txt .= $to_campo->descripcion().' b='.$to_campo->busqueda() ;
+						$txt .= $to_campo->descripcion() ;
 						$txt .= '</th>' ;
 						$i++ ;
 					}
@@ -1295,7 +1351,7 @@ class entidadj {
 			//
 			// Botones
 			$txt=$txt.'<tr><td colspan="'.$cntcols.'">';
-			$txt=$txt.'<input type="submit" value="Agregar" name="'.$this->prefijo_campo.'_okAgregar">';
+			$txt=$txt.'<input type="submit" value="Agregar" name="'.$this->okAgregar.'">';
 			if ( $this->existe == true )
 				{ 
 					//$txt=$txt.'<tr><td colspan="'.$cntcols.'">';

@@ -16,9 +16,11 @@ class escuelas_general extends entidadj {
 			//
 			// tipos:  'pk' 'fk' 'otro' 'date' 'datetime' 'time' 'number' 'email' 'url' 'password'
 			//								el tipo 'fk' espera que se defina una clase 
+			$this->clave_manual_activar() ; // La clave de la entidad se ingresa manualment
 			$this->lista_campos_lista=array();
 			
 			$this->lista_campos_lista[]=new campo_entidad( 'CUE' 			, 'pk' 		, 'Codigo Estab.' , NULL ,true) ;
+			$this->lista_campos_lista[0]->pone_busqueda() ;
 			$this->lista_campos_lista[]=new campo_entidad( 'NOMBRE' 	, 'text' 	, 'Establecimiento'  ) ;
 			$this->lista_campos_lista[1]->pone_busqueda() ;
 			$this->lista_campos_lista[]=new campo_entidad( 'DOMICILIO' 	, 'text' 	, 'Direccion'  ) ;
