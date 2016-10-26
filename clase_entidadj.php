@@ -210,10 +210,10 @@ class entidadj {
 				$i = 0 ;
 				foreach ( $this->lista_campos_lectura as $campo )
 					{
-						$tp = $campo['tipo'] ;
+						$tp = $campo->tipo() ;
 						if ( $tp == 'pk' )
 							{
-							$where = ' '.$campo['nombre']." = '".$this->id."' " ;
+							$where = ' '.$campo->nombre()." = '".$this->id."' " ;
 							}
 						//
 						// tipos de camos validos
@@ -240,9 +240,9 @@ class entidadj {
 							//
 							// Instruccion set...
 							if ( empty( $valor ) )
-							$strsql .= $campo['nombre']. " = NULL " ;
+							$strsql .= $campo->nombre(). " = NULL " ;
 							else
-							$strsql .= $campo['nombre']. " = '".$valor."' " ;
+							$strsql .= $campo->nombre(). " = '".$valor."' " ;
 							}
 						$i++;
 					}
@@ -439,7 +439,12 @@ class entidadj {
 				  $txt=$txt.'</td>';
 					$cpo->pone_nombre( $this->prefijo_campo.'cpoNro'.$i.'_' ) ;
 					$cpo->pone_valor( '' ) ;
-					if( $this->lista_campos_lectura[$i]->tipo() == 'pk' )
+					if( $this->lista_campos_lectura[$i]->tipo() == 'pk' and $this->clave_manual )
+					{
+						$cpo->pone_tipo( 'number' ) ;
+							$txt = $txt.$cpo->txtMostrarParaModificar() ;
+					}
+					elseif( $this->lista_campos_lectura[$i]->tipo() == 'pk' )
 					{
 						$cpo->pone_valor( 'nuevo' );
 						$cpo->pone_tipo( 'text' ) ;
@@ -478,7 +483,7 @@ class entidadj {
 				return $txt ;
 		}
 
-		public function texto_agregar_okGrabar()
+		public function texto_agregar_okGrabar() 
 		{
 			//$nomid = $this->prefijo_campo.'id';
 			//$this->Set_id($_POST[$nomid]);
@@ -493,6 +498,7 @@ class entidadj {
 			$lst_val = '';
 			$primerCampo = true;
 			$i = 0 ;
+			$tn_valor_id = 0 ;
 			foreach ( $this->lista_campos_lectura as $campo )
 				{
 					//
@@ -500,7 +506,7 @@ class entidadj {
 					$tp = $campo->tipo() ;
 					//
 					// tipos de camos validos
-					if ( $tp != 'otro' and $tp != 'pk' )
+					if ( $tp != 'otro' and ( $tp != 'pk' or $this->clave_manual ) )
 						{
 						//
 						// Agrega coma
@@ -521,6 +527,7 @@ class entidadj {
 						// Valor a reemplazar en el campo
 						if ( $tp == 'time' ) $valor = '1899-12-30 '.$_POST[$nomCtrl] ;
 						else $valor = $_POST[$nomCtrl] ;
+						if ( $tp == 'pk' ) $this->id = $valor ;
 						//
 						// Lista campos
 						$lst_cmp = $lst_cmp. $campo->nombre() ;
@@ -536,10 +543,13 @@ class entidadj {
 			$insertado = $cn->conexion->query($strsql) ;
 			if ( $insertado ) 
 				{ 
-					$result = $cn->conexion->query('SELECT last_insert_id()');
-					$reg = $result->fetch_array(MYSQLI_NUM);
-					$this->id = $reg[0];
-					$result->free();
+					if ( ! $this->clave_manual )
+					{
+						$result = $cn->conexion->query('SELECT last_insert_id()');
+						$reg = $result->fetch_array(MYSQLI_NUM);
+						$this->id = $reg[0];
+						$result->free();
+					}
 				}
 			else
 				{
@@ -1339,8 +1349,8 @@ class entidadj {
 				
 				// Acciones
 				$txt=$txt.'<td>' ;
-				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->prefijo_campo.'okVer=1">Ver</a>' ;
-				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->prefijo_campo.'okModificar=1">Modificar</a>' ;
+				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->okVer.'=1">Ver</a>' ;
+				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->okModificar.'=1">Modificar</a>' ;
 				foreach( $this->acciones as $accion )
 					{
 						$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->prefijo_campo.$accion['nombre'].'=1">'.$accion['texto'].'</a>' ;
