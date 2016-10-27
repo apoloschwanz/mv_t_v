@@ -1172,6 +1172,19 @@ WHERE anexo.anexo_Nro = '".$this->id."' "  ;
 				
 				' ;
 		}
+		protected function z_consulta_anexos_sin_encuestas_cargadas()
+		{
+			$this->strsql = "
+					select anexo.Anexo_Nro,anexo.Fecha, count( encuestas.Nro_Encuesta ) , encuestas.Tipo_de_Encuesta_Cod, capacitaciones.Programa_Nro
+					from anexo
+					left join encuestas on encuestas.Anexo_Nro = anexo.Anexo_Nro
+					left join escuelas_general on anexo.CUE = escuelas_general.CUE
+					left join capacitaciones on capacitaciones.Anexo_Nro = anexo.Anexo_Nro
+					where anexo.Edicion_Nro = 2016 and anexo.Fecha = '2016-10-03' 
+					group by anexo.Anexo_Nro,anexo.Fecha,encuestas.Tipo_de_Encuesta_Cod
+					order by capacitaciones.Programa_Nro,anexo.Anexo_Nro,encuestas.Tipo_de_Encuesta_Cod
+							" ;
+		}
 }
 ?>
 

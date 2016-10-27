@@ -17,6 +17,26 @@ class tipos_de_establecimiento extends entidadj {
 		$this->lista_campos_lectura[]=new campo_entidad( 'Tipo_Estab_Nro' 			, 'pk' 		, 'Tipo de Establecimiento Nro.'  ) ;
 		$this->lista_campos_lectura[]=new campo_entidad( 'Tipo_Estab' 	, 'text' 	, 'Tipo de Establecimiento'  ) ;
 	}
+	protected function crea_tabla()
+	{
+		$this->strsql = "
+				create table tipos_de_establecimiento
+					( Tipo_Estab_Nro INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+						Tipo_Estab VARCHAR(50) ) ;
+						
+				select escuelas_general.TIPO, COUNT(*) from escuelas_general
+				GROUP BY escuelas_general.TIPO having COUNT(*) > 5 ;
+				
+				insert into tipos_de_establecimiento ( Tipo_Estab )
+				select escuelas_general.TIPO from escuelas_general
+				GROUP BY escuelas_general.TIPO having COUNT(*) > 5 
+				where escuelas_general.TIPO is not null
+		
+						" ;
+		
+	}
+	
+	
 }
 
 ?>
