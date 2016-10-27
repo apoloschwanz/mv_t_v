@@ -81,9 +81,6 @@ class entidadj {
  		protected function Pone_Datos_Fijos_No_Heredables()
 		{	
 			//
-			// Prefijo campo
-			$this->prefijo_campo = 'm_ent_' ;
-			//
 			// Lista de Campos
 			//
 			// tipos:  'pk' 'fk' 'otro' 'date' 'datetime' 'time' 'number' 'email' 'url' 'password'
@@ -105,30 +102,37 @@ class entidadj {
 			$this->nombre_tabla = "Nombre de la_tabla" ;
 			$this->nombre_fisico_tabla = "nombre_de_la_tabla" ;
 			//
-			// Nombre de la pagina
-			$this->nombre_pagina = $_SERVER['PHP_SELF'] ;
-			//
-			// Paginacion
-			$this->desde = 0 ;																					// by DZ 2015-08-14 - agregado lista de datos
-			$this->cuenta = 15 ;																				// by DZ 2015-08-14 - agregado lista de datos		
-			//
-			// Acciones Extra para texto_mostrar_abm
-			//$this->acciones = array( 'nombre'=>'okAsignarDte' , 'texto'=>'AsignarDte' ) ;
-			//
-			// Botones Extra para texto_mostrar_abm
-			//$this->botones_extra_abm[] = array( 'nombre'=>$this->prefijo_campo.'_okExportar' , 'texto'=>'Exportar' ) ;
-			
-			//
-			// Botones extra edicion
-			//$this->botones_extra_edicion[] = array( 'name'=> '_Rel1' ,
-			//										'value'=>'Salir' ,
-			//										'link'=>'salir.php' ) ; // '<input type="submit" name="'.$this->prefijo_campo.'_Rel1" value="Salir" autofocus>
-			//
-			// Filtros
-			$this->con_filtro_fecha = false;
-			//
-			//
 		}
+	protected function Pone_Datos_Fijos_Personalizables()
+	{
+		//
+		// Prefijo campo
+		$this->prefijo_campo = 'm_'.get_class($this).'_' ;
+		//
+		// Nombre de la pagina
+		$this->nombre_pagina = $_SERVER['PHP_SELF'] ;
+		//
+		// Paginacion
+		$this->desde = 0 ;																					// by DZ 2015-08-14 - agregado lista de datos
+		$this->cuenta = 15 ;																				// by DZ 2015-08-14 - agregado lista de datos		
+		//
+		// Acciones Extra para texto_mostrar_abm
+		//$this->acciones = array( 'nombre'=>'okAsignarDte' , 'texto'=>'AsignarDte' ) ;
+		//
+		// Botones Extra para texto_mostrar_abm
+		//$this->botones_extra_abm[] = array( 'nombre'=>$this->prefijo_campo.'_okExportar' , 'texto'=>'Exportar' ) ;
+		
+		//
+		// Botones extra edicion
+		//$this->botones_extra_edicion[] = array( 'name'=> '_Rel1' ,
+		//										'value'=>'Salir' ,
+		//										'link'=>'salir.php' ) ; // '<input type="submit" name="'.$this->prefijo_campo.'_Rel1" value="Salir" autofocus>
+		//
+		// Filtros
+		$this->con_filtro_fecha = false;
+		//
+		//
+	}
 	protected function clave_manual_activar()
 	{
 		$this->clave_manual = true ;
@@ -161,6 +165,9 @@ class entidadj {
 			$this->tiene_lista_detalle = false ; // se activa en rutina de lista detalle
 			$this->lista_detalle_enc_columnas = array();
 			$this->clave_manual = false ; // se activa en $this->clave_manual_activar() ;
+			//
+			// Datos Personalizables
+			$this->Pone_Datos_Fijos_Personalizables() ; // by DZ 2016-10-24
 			//
 			// Personalizacion de variables
 			$this->Pone_Datos_Fijos_No_Heredables() ; // by DZ 2016-10-11
@@ -383,22 +390,22 @@ class entidadj {
 								{
 									$txt=$txt.'<tr>';
 									$txt=$txt.'<td>';
-								  $txt=$txt.$this->lista_campos_lectura[$i]['descripcion'];
+								  $txt=$txt.$this->lista_campos_lectura[$i]->descripcion();
 								  $txt=$txt.'</td>';
 									$cpo->pone_nombre( $this->prefijo_campo.'cpoNro'.$i.'_' ) ;
 									$cpo->pone_valor( $reg[$i] ) ;
-									if( $this->lista_campos_lectura[$i]['tipo'] == 'pk' or $this->lista_campos_lectura[$i]['tipo'] == 'otro' )
+									if( $this->lista_campos_lectura[$i]->tipo() == 'pk' or $this->lista_campos_lectura[$i]->tipo() == 'otro' )
 										{ 
 											$cpo->pone_tipo( 'text' ) ;
 											$txt = $txt.$cpo->txtMostrarEtiqueta() ;
 										}
-									elseif( $this->lista_campos_lectura[$i]['tipo'] == 'fk' )
+									elseif( $this->lista_campos_lectura[$i]->tipo() == 'fk' )
 										{
 											//
 											// Lista de fk
 											//
 											$cpo->pone_tipo( 'select' ) ;
-											$lista_fk = $this->lista_campos_lectura[$i]['clase']->Obtener_Lista() ;
+											$lista_fk = $this->lista_campos_lectura[$i]->objeto()->Obtener_Lista() ;
 											$cpo->pone_lista( $lista_fk ) ;
 											$cpo->pone_posicion_codigo( 0 ) ;
 											$cpo->pone_posicion_descrip( 1 ) ;
@@ -407,7 +414,7 @@ class entidadj {
 										}
 									else
 										{ 
-											$cpo->pone_tipo( $this->lista_campos_lectura[$i]['tipo'] ) ;
+											$cpo->pone_tipo( $this->lista_campos_lectura[$i]->tipo() ) ;
 											$txt = $txt.$cpo->txtMostrarParaVer() ;
 										}
 									$txt=$txt.'</tr>';
@@ -648,7 +655,7 @@ class entidadj {
 			//
 			// Muestra pantalla para editar datos
 			$hidden = '<input type="hidden" name="'.$this->prefijo_campo.'_id'.'" value="'.$this->id.'" > ' ;
-			$botones = '<input type="submit" name="'.$this->okSalir.'" value="Salir" autofocus>';
+			$botones = '<input type="submit" name="ok" value="Salir" autofocus>';
 			$botones .= '<input type="submit" name="'.$this->okReleer.'" value="Revertir" >';
 			$botones .= '<input type="submit" name="'.$this->okGrabar.'" value="Grabar" >';
 			$botones .= $btn_extra ;
@@ -657,6 +664,24 @@ class entidadj {
 			//
 			// Muestra la cabecera
 			$texto = $this->texto_actualizar();
+			$pagina->insertarCuerpo($texto);
+			//
+			// Grafica la página
+			$pagina->graficar_c_form($_SERVER['PHP_SELF']);
+		}
+		protected function mostrar_vista()
+		{
+			//
+			// Botones extra
+			//
+			// Muestra pantalla para editar datos
+			$hidden = '<input type="hidden" name="'.$this->prefijo_campo.'_id'.'" value="'.$this->id.'" > ' ;
+			$botones = '<input type="submit" name="ok" value="Salir" autofocus>';
+			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
+			$pagina->sinborde();
+			//
+			// Muestra la cabecera
+			$texto = $this->texto_ver();
 			$pagina->insertarCuerpo($texto);
 			//
 			// Grafica la página
@@ -714,12 +739,20 @@ class entidadj {
 				$this->mostrar_edicion();
 				//muestra_modificar($Entidad) ;
 			}
+			elseif ( isset($_GET[$this->okVer]) )
+			{
+				//
+				// Edita
+				$nomid = $this->obtiene_prefijo_campo().'_Id' ;
+				$this->Set_id($_REQUEST[$nomid]) ;
+				$this->mostrar_vista();
+			}
 			elseif ( isset( $_POST[$this->okSalir] ) )
 			{
 				$this->ok_Salir() ;
 			}
 			elseif ( isset( $_POST[$this->okReleer] ) )
-				die('dijo: Ok Reller !') ;
+				die('-------- !') ;
 			elseif ( isset( $_POST[$this->okGrabar] ) )
 			{
 				// Graba Modificaciones
