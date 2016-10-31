@@ -633,7 +633,7 @@ class entidadj {
 		}
 		protected function mostrar_alta()
 		{
-			$botones = '<input type="submit" name="'.$this->okSalir.'" value="Salir" autofocus>';
+			$botones = '<input type="submit" name="ok" value="Salir" autofocus>';
 			$botones .= '<input type="submit" name="'.$this->okReleer.'" value="Revertir" >';
 			$botones .= '<input type="submit" name="'.$this->okGrabaAgregar.'" value="Agregar" >';
 			$pagina=new Paginai($this->pagina_titulo,$botones);
