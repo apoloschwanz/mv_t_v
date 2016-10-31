@@ -35,6 +35,8 @@ class tipos_de_establecimiento extends entidadj {
 		
 				alter table escuelas_general add Tipo_Estab_Nro INT ;
 				
+				alter table escuelas_general add FOREIGN KEY (Tipo_Estab_Nro) REFERENCES tipos_de_establecimiento(Tipo_Estab_Nro)
+				
 				update escuelas_general set Tipo_Estab_Nro=(select Tipo_Estab_Nro from tipos_de_establecimiento where tipos_de_establecimiento.Tipo_Estab = escuelas_general.TIPO )
 				
 				
