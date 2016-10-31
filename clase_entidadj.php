@@ -36,6 +36,7 @@ class entidadj {
 	protected $pagina_titulo ;
 	protected $okGrabaAgregar ;
 	protected $okModificar ;
+	protected $okBorrarUno;
 	protected $okGrabar  ;
 	protected $okReleer  ;
 	protected $okSalir ;
@@ -73,7 +74,8 @@ class entidadj {
 	protected $accion_ok;
 	protected $accion_especial_seleccionada;
 	protected $existe ;			
-	protected $clave_manual;							
+	protected $clave_manual;				
+	protected $borrar_con_seleccion;			
 /////////////////////////////////////-------- variables de la clase entidad --------- //////////////////////////////////
   // by DZ 2016-01-22 - protected $lista_campos_descrip ;																
 	// by DZ 2016-01-22 - sacar ---- protected $lista_campos_tipo ;																	
@@ -157,6 +159,7 @@ class entidadj {
 			// Inicializacion de Variables
 			$pagina_url_anterior = 'acceuil.php' ;
 			$this->existe = false ;
+			$this->borrar_con_seleccion = false ;
 			$this->botones_extra_edicion = array();
 			$this->botones_extra_abm = array() ;
 			$this->acciones = array() ;
@@ -177,6 +180,7 @@ class entidadj {
 			$this->okReleer= $this->prefijo_campo. '_okReleer';
 			$this->okGrabar= $this->prefijo_campo. '_okGrabar';
 			$this->okModificar=$this->prefijo_campo. '_okModificar';
+			$this->okBorrarUno=$this->prefijo_campo. '_okBorrarUno';
 			$this->okAgregar=$this->prefijo_campo. '_okAgregar';
 			$this->okVer=$this->prefijo_campo. '_okVer';
 			$this->okGrabaAgregar= $this->prefijo_campo. '_okGrabaAgregar';
@@ -1344,6 +1348,13 @@ class entidadj {
 					$txt=$txt.'<input type="checkbox" name="'.$this->prefijo_campo.'_Id'.$reg[0].'">';
 					$txt=$txt.'</td>'; 
 				*/
+				if ( $this->borrar_con_seleccion )
+				{
+					$txt.= '<td>' ;
+					$txt.= '<input type="checkbox" name="'.$this->prefijo_campo.'_Id'.$reg[0].'">';
+					$txt.= '</td>' ;
+				}
+				
 				//
 				// Datos
 				$i = 0 ;
@@ -1384,9 +1395,13 @@ class entidadj {
 				$txt=$txt.'<td>' ;
 				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->okVer.'=1">Ver</a>' ;
 				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->okModificar.'=1">Modificar</a>' ;
+				if ( ! $this->borrar_con_seleccion )
+				{
+					$txt.='<button type="submit" value="'.$reg[0].'" name="'.$this->okBorrarUno.'">Borrar</button>';
+				}
 				foreach( $this->acciones as $accion )
 					{
-						$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->prefijo_campo.$accion['nombre'].'=1">'.$accion['texto'].'</a>' ;
+						//$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->prefijo_campo.$accion['nombre'].'=1">'.$accion['texto'].'</a>' ;
 					} 
 					$txt=$txt.'</td>' ;
 					$txt=$txt.'</tr>';
