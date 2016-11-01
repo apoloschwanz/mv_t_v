@@ -8,6 +8,7 @@ class campo_entidad {
 	protected $objeto ; 
 	protected $mostrar ;
 	protected $busqueda ;
+	protected $valor ;
 	public function __construct($nombre_del_campo,$tipo = 'text',$descripcion=NULL,$objeto_del_campo=NULL,$forzar_mostrar=false)
 	{
 		$this->nombre = $nombre_del_campo ;
@@ -27,6 +28,50 @@ class campo_entidad {
 	public function mostrar() { return $this->mostrar ; }
 	public function pone_busqueda() { $this->busqueda = true ; }
 	public function busqueda() { return $this->busqueda ; }
+	public function pone_valor($valor) { $this->valor = $valor ; }
+	public function valor() { return $this->valor ; }
+	public function valor_sql()
+	{
+		$tv_valor = $this->valor_saneado() ;
+		if ( empty( $tv_valor ) )
+			{
+				$ts_valor_sql = ' NULL ' ;
+			}
+		else
+			{
+				if ( $this->tipo == 'time' ) 
+					$ts_valor_sql = '1899-12-30 '.$tv_valor ;
+				else
+					$ts_valor_sql =  " '".$tv_valor."' " ;
+			}
+		//
+		$ts_valor_sql = htmlspecialchars( $ts_valor_sql ) ;
+		return $ts_valor_sql ; 
+		
+	}
+	public function valor_saneado()
+	{
+		$valor_saneado = NULL ;
+		// 'pk' 'fk' 'otro' 'date' 'datetime' 'time' 'number' 'email' 'url' 'password'
+		if ( $this->tipo == 'pk' or $this->tipo == 'fk') { 
+			$valor_saneado = filter_var($this->valor, FILTER_SANITIZE_NUMBER_INT ); 
+		}
+		elseif( $this->tipo == 'number' ) {
+			$valor_saneado = filter_var($this->valor, FILTER_SANITIZE_NUMBER_FLOAT ) ;
+		}
+		elseif( $this->tipo == 'email' ) {
+			$valor_saneado = filter_var($this->valor, FILTER_SANITIZE_EMAIL ) ; 
+		}
+		elseif( $this->tipo == 'url' ) {
+			$valor_saneado = filter_var($this->valor, FILTER_SANITIZE_URL ) ; 
+		}
+		else { 
+			$valor_saneado = filter_var($this->valor, FILTER_SANITIZE_STRING ) ; 
+		}
+		return $valor_saneado ;
+	}
+		
+		
 }
 
 class entidadj {
@@ -34,14 +79,15 @@ class entidadj {
 	protected $lista_campos_lista ;
 	protected $lista_campos_lectura ;
 	protected $pagina_titulo ;
-	protected $okGrabaAgregar ;
-	protected $okModificar ;
 	protected $okBorrarUno;
+	protected $okGrabaAgregar ;
+	protected $okGrabaBorrarUno ;
+	protected $okAgregar ;
+	protected $okModificar ;
 	protected $okGrabar  ;
 	protected $okReleer  ;
 	protected $okSalir ;
 	protected $okVer ;
-	protected $okAgregar ;
 	public $okExportar ;
 	protected $botones_extra_edicion ;
 /////////////////////////////////////-------- variables de la clase entidad --------- //////////////////////////////////
@@ -168,6 +214,7 @@ class entidadj {
 			$this->tiene_lista_detalle = false ; // se activa en rutina de lista detalle
 			$this->lista_detalle_enc_columnas = array();
 			$this->clave_manual = false ; // se activa en $this->clave_manual_activar() ;
+			$this->pagina_titulo = NULL ;
 			//
 			// Datos Personalizables
 			$this->Pone_Datos_Fijos_Personalizables() ; // by DZ 2016-10-24
@@ -175,12 +222,16 @@ class entidadj {
 			// Personalizacion de variables
 			$this->Pone_Datos_Fijos_No_Heredables() ; // by DZ 2016-10-11
 			//
+			// Datos que no fueron seteados y dependen de otros
+			if( ! $this->pagina_titulo ) $this->pagina_titulo = $this->nombre_tabla ;
+			//
 			// Botones:
 			$this->okSalir= $this->prefijo_campo. '_okSalir';
 			$this->okReleer= $this->prefijo_campo. '_okReleer';
 			$this->okGrabar= $this->prefijo_campo. '_okGrabar';
 			$this->okModificar=$this->prefijo_campo. '_okModificar';
 			$this->okBorrarUno=$this->prefijo_campo. '_okBorrarUno';
+			$this->okGrabaBorrarUno=$this->prefijo_campo. '_okGrabaBorrarUno';
 			$this->okAgregar=$this->prefijo_campo. '_okAgregar';
 			$this->okVer=$this->prefijo_campo. '_okVer';
 			$this->okGrabaAgregar= $this->prefijo_campo. '_okGrabaAgregar';
@@ -196,6 +247,22 @@ class entidadj {
 				break ;
 			}
   	}
+  	protected function leer_post_de_campos()
+  	{
+		$i = 0 ;
+		foreach ( $this->lista_campos_lectura as $campo )
+		{
+			//
+			// Nombre de campo
+			$ts_nomCtrl = $this->prefijo_campo.'cpoNro'.$i.'_'  ;
+			//
+			// Valor del campo
+			$campo->pone_valor($_POST[$ts_nomCtrl]) ;
+			$i++;
+		}
+		var_dump( $this->lista_campos_lectura ) ;
+		die('<br> leeer post de campos') ;
+	}
 
 	public function texto_actualizar_okGrabar()
 		{
@@ -213,6 +280,10 @@ class entidadj {
 				//
 				// Abre la conexión con la base de datos
 				$cn=new Conexion();
+				//
+				// Levanta los valores de los campos
+				$this->leer_post_de_campos() ;
+				die('Leyo post de campos') ;
 				//
 				// Arma lista de campos a actualizar
 				$primerCampo = true;
@@ -315,7 +386,8 @@ class entidadj {
 									if( $this->lista_campos_lectura[$i]->tipo() == 'pk' or $this->lista_campos_lectura[$i]->tipo() == 'otro' )
 										{ 
 											$cpo->pone_tipo( 'text' ) ;
-											$txt = $txt.$cpo->txtMostrarEtiqueta() ;
+											$txt .= $cpo->txtMostrarOculto() ;
+											$txt .= $cpo->txtMostrarEtiqueta() ;
 										}
 									elseif( $this->lista_campos_lectura[$i]->tipo() == 'fk' )
 										{
@@ -352,6 +424,89 @@ class entidadj {
 				}
 				return $txt ;
 		}
+		public function texto_eliminar()
+		{
+			$this->error= false ;
+			$cpo = new Campo();
+			$this->Leer();
+			if ( $this->existe == false )
+			{ 
+				$this->error = true ;
+				$this->textoError = "El registro con Id: ".$this->id." no se encuentra en la base de datos " ;
+			}
+			//
+			// Otra validacion
+			//
+			//if ($this->Error == false )
+			//	{ 
+			//		//.....validacion
+			//		if ( condicion de error )
+			//			{
+			//			$this->Error = true;
+
+			//			$this->TextoError = ' Texto del error ' ;
+			//			}
+			//		
+			//	}
+			if ( $this->error == true )
+				{
+					$txt = '<td>'.$this->textoError.'</td>';
+				}
+			else
+				{
+					//
+					// Abre tabla
+					$txt = '<table class="tablacampos">';
+					if ( $reg=mysqli_fetch_array($this->registros,MYSQLI_NUM) )
+						{
+							$txt=$txt.'<tr>';
+							$txt=$txt.'<td></td><td><input type="hidden" name="'.$this->prefijo_campo.'id" value="'.$this->id.'"></td>';
+							$txt=$txt.'</tr>';
+							for($i=0;$i<count($reg);$i++)
+								{
+									$txt=$txt.'<tr>';
+									$txt=$txt.'<td>';
+								  $txt=$txt.$this->lista_campos_lectura[$i]->descripcion();
+								  $txt=$txt.'</td>';
+									$cpo->pone_nombre( $this->prefijo_campo.'cpoNro'.$i.'_' ) ;
+									$cpo->pone_valor( $reg[$i] ) ;
+									if( $this->lista_campos_lectura[$i]->tipo() == 'pk' or $this->lista_campos_lectura[$i]->tipo() == 'otro' )
+										{ 
+											$cpo->pone_tipo( 'text' ) ;
+											$txt = $txt.$cpo->txtMostrarEtiqueta() ;
+										}
+									elseif( $this->lista_campos_lectura[$i]->tipo() == 'fk' )
+										{
+											//
+											// Lista de fk
+											//
+											$cpo->pone_tipo( 'select' ) ;
+											$lista_fk = $this->lista_campos_lectura[$i]->objeto()->Obtener_Lista() ;
+											$cpo->pone_lista( $lista_fk ) ;
+											$cpo->pone_posicion_codigo( 0 ) ;
+											$cpo->pone_posicion_descrip( 1 ) ;
+											$cpo->pone_mostar_nulo_en_si() ;
+											$txt = $txt.$cpo->txtMostrarParaVer() ;
+										}
+									else
+										{ 
+											$cpo->pone_tipo( $this->lista_campos_lectura[$i]->tipo() ) ;
+											$txt = $txt.$cpo->txtMostrarParaVer() ;
+										}
+									$txt=$txt.'</tr>';
+								}
+						}
+					else
+						{
+							$txt=$txt.'<td> mysqli_fetch_array No encontro registro </td>';
+						}
+					//
+					// Cierra tabla
+					$txt = $txt.'</table>';
+				}
+				return $txt ;
+		}
+
 	public function texto_ver()
 		{
 			$this->error= false ;
@@ -453,12 +608,14 @@ class entidadj {
 					if( $this->lista_campos_lectura[$i]->tipo() == 'pk' and $this->clave_manual )
 					{
 						$cpo->pone_tipo( 'number' ) ;
-							$txt = $txt.$cpo->txtMostrarParaModificar() ;
+						$txt .= $cpo->txtMostrarOculto() ;
+						$txt = $txt.$cpo->txtMostrarParaModificar() ;
 					}
 					elseif( $this->lista_campos_lectura[$i]->tipo() == 'pk' )
 					{
 						$cpo->pone_valor( 'nuevo' );
 						$cpo->pone_tipo( 'text' ) ;
+						$txt .= $cpo->txtMostrarOculto() ;
 						$txt = $txt.$cpo->txtMostrarEtiqueta() ;
 					}
 					elseif( $this->lista_campos_lectura[$i]->tipo() == 'otro' )
@@ -570,6 +727,8 @@ class entidadj {
 				}
 			$cn->cerrar();
 		}	
+
+
 		public function pagina_pone_url_anterior($url)
 		{
 			$this->pagina_url_anterior = $url ;
@@ -659,7 +818,7 @@ class entidadj {
 			//
 			// Muestra pantalla para editar datos
 			$hidden = '<input type="hidden" name="'.$this->prefijo_campo.'_id'.'" value="'.$this->id.'" > ' ;
-			$botones = '<input type="submit" name="ok" value="Salir" autofocus>';
+			$botones = '<input type="submit" name="ok" value="Volver" autofocus>';
 			$botones .= '<input type="submit" name="'.$this->okReleer.'" value="Revertir" >';
 			$botones .= '<input type="submit" name="'.$this->okGrabar.'" value="Grabar" >';
 			$botones .= $btn_extra ;
@@ -673,6 +832,27 @@ class entidadj {
 			// Grafica la página
 			$pagina->graficar_c_form($_SERVER['PHP_SELF']);
 		}
+		protected function mostrar_eliminacion()
+		{
+			//
+			// Muestra pantalla para editar datos
+			$hidden = '<input type="hidden" name="'.$this->prefijo_campo.'_id'.'" value="'.$this->id.'" > ' ;
+			$botones = '<input type="submit" name="ok" value="Volver" autofocus>';
+			$botones .= '<input type="submit" name="'.$this->okGrabaBorrarUno.'" value="Borrar" >';
+			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
+			$pagina->sinborde();
+			//
+			// Subtitulo
+			$texto = ' Va a borrar los siguientes datos : ';
+			$pagina->insertarCuerpo($texto);
+			//
+			// Muestra la cabecera
+			$texto = $this->texto_eliminar();
+			$pagina->insertarCuerpo($texto);
+			//
+			// Grafica la página
+			$pagina->graficar_c_form($_SERVER['PHP_SELF']);
+		}
 		protected function mostrar_vista()
 		{
 			//
@@ -680,7 +860,7 @@ class entidadj {
 			//
 			// Muestra pantalla para editar datos
 			$hidden = '<input type="hidden" name="'.$this->prefijo_campo.'_id'.'" value="'.$this->id.'" > ' ;
-			$botones = '<input type="submit" name="ok" value="Salir" autofocus>';
+			$botones = '<input type="submit" name="ok" value="Volver" autofocus>';
 			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
 			$pagina->sinborde();
 			//
@@ -743,6 +923,14 @@ class entidadj {
 				$this->mostrar_edicion();
 				//muestra_modificar($Entidad) ;
 			}
+			elseif ( isset($_POST[$this->okBorrarUno]) )
+			{
+				//
+				// Edita
+				$this->Set_id($_REQUEST[$this->okBorrarUno]) ;
+				$this->mostrar_eliminacion();
+				//muestra_modificar($Entidad) ;
+			}
 			elseif ( isset($_GET[$this->okVer]) )
 			{
 				//
@@ -770,6 +958,14 @@ class entidadj {
 				if ( $this->hay_error() == true ) $this->muestra_error() ;
 				else $this->muestra_ok('Registro # '.$this->id().' agregado') ;
 			}
+			elseif ( isset($_POST[$this->okGrabaBorrarUno]) )
+			{
+				//
+				// Confirma Borrar
+				$this->texto_eliminar_okGrabar();
+				if ( $this->hay_error() == true ) $this->muestra_error() ;
+				else $this->muestra_ok('Registro # '.$this->id().' eliminado') ;
+			}
 			else
 			{
 				$this->mostrar_lista_abm() ;
@@ -779,7 +975,7 @@ class entidadj {
 		public function mostrar_lista_abm()
 		{
 			$hidden = '' ;
-			$pagina = new Paginai($this->nombre_tabla ,$hidden.'<input type="submit" name="okSalir" value="Salir" autofocus>') ;
+			$pagina = new Paginai($this->nombre_tabla ,$hidden.'<input type="submit" name="'.$this->okSalir.'" value="Salir" autofocus>') ;
 			//
 			// Muestra la cabecera
 			$texto = $this->texto_mostrar_abm() ;
@@ -791,7 +987,7 @@ class entidadj {
 		protected function muestra_error() 
 		{
 			$hidden = '' ;
-			$botones = '<input type="submit" name="'.$this->okSalir.'" value="Ok" autofocus>';
+			$botones = '<input type="submit" name="ok" value="Ok" autofocus>';
 			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
 			$pagina->sinborde();
 			//
@@ -805,7 +1001,7 @@ class entidadj {
 		protected function muestra_ok($ps_mje) 
 		{
 			$hidden = '' ;
-			$botones = '<input type="submit" name="'.$this->okSalir.'" value="Ok" autofocus>';
+			$botones = '<input type="submit" name="ok" value="Ok" autofocus>';
 			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
 			$pagina->sinborde();
 			//
@@ -1242,7 +1438,44 @@ class entidadj {
 		}
 			
 	}
-
+	public function texto_eliminar_okGrabar()
+	{
+		$nomid = $this->prefijo_campo.'id';
+		$this->Set_id($_POST[$nomid]);
+		$this->error = false ;
+		$this->Leer();
+		if ( $this->existe == false )
+		{ 
+			$this->error = true ;
+			$this->textoError = "El registro con Id: ".$this->id." no se encuentra en la base de datos " ;
+		}
+		if ($this->error == false )
+		{
+			//
+			// Abre la conexión con la base de datos
+			$cn=new Conexion();
+			//
+			// Arma lista de campos a actualizar
+			$where = 'false' ;
+			$strsql = ' DELETE FROM '.$this->nombre_fisico_tabla.' ' ;
+			$i = 0 ;
+			foreach ( $this->lista_campos_lectura as $campo )
+				{
+					$tp = $campo->tipo() ;
+					if ( $tp == 'pk' )
+						{
+						$where = ' '.$campo->nombre()." = '".$this->id."' " ;
+						}
+					$i++;
+				}
+			$strsql = $strsql.' WHERE '.$where.' ' ;
+			//
+			// Cierra la conexion
+			$borrado = $cn->conexion->query($strsql) ;
+			if( ! $borrado ) die( "Problemas en el delete de ".$this->nombre_tabla." : ".$cn->conexion->error.$strsql ) ;
+			$cn->cerrar();
+		}
+	}	
 	public function texto_mostrar_abm()
 		{
 			$this->leer_filtros();
@@ -1393,11 +1626,12 @@ class entidadj {
 				
 				// Acciones
 				$txt=$txt.'<td>' ;
-				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->okVer.'=1">Ver</a>' ;
-				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->okModificar.'=1">Modificar</a>' ;
+				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->okVer.'=1"><button type="button">Ver</button></a>' ;
+				$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->okModificar.'=1"><button type="button">Modificar</button></a>' ;
 				if ( ! $this->borrar_con_seleccion )
 				{
 					$txt.='<button type="submit" value="'.$reg[0].'" name="'.$this->okBorrarUno.'">Borrar</button>';
+					//$txt.=' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->okBorrarUno.'=1">Borrar</a>' ;
 				}
 				foreach( $this->acciones as $accion )
 					{
