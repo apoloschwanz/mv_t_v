@@ -7,7 +7,7 @@ class Conexion {
   private $usr ;
   private $pass ;
   private $db ;
-	private $extension ;
+  private $extension ;
   public function __construct()
   {
 	//
@@ -20,7 +20,7 @@ class Conexion {
 		$this->db = 'mvme_test' ;
 		$this->host = 'localhost';		
 		$this->usr = 'root';
-		$this->pass = 'Root123' ;
+		$this->pass = 'root' ;
 		$this->extension = 'mysql' ;
 		}	
 	//

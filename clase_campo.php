@@ -163,6 +163,20 @@ class Campo {
 				$txt.=' value="'.$this->valor.'" ' ;
 				$txt.='>' ;
 				$txt.='</td>';
+		return $txt ;
+	}
+	public function txtMostrarOcultoyEtiqueta()
+	{
+				$txt='';
+				$txt.='<td>' ;
+				$txt.='<input ' ;
+				$txt.=' name="'.$this->nombre.'" ' ;
+				$txt.=' type="hidden" ' ;
+				$txt.=' value="'.$this->valor.'" ' ;
+				$txt.='>' ;
+				$txt.=$this->valor ;
+				$txt.='</td>';
+		return $txt ;
 	}
 	public function txtMostrarEtiqueta()
 	{

@@ -2,6 +2,7 @@
 
 require_once 'clase_entidadj.php' ;
 require_once 'clase_gestion_tipo.php' ;
+require_once 'clase_tipos_de_establecimiento.php' ;
 
 class escuelas_general extends entidadj {
 	
@@ -32,6 +33,7 @@ class escuelas_general extends entidadj {
 			$this->lista_campos_lectura[]=new campo_entidad( 'DOMICILIO' 	, 'text' 	, 'Direccion'  ) ;
 			$this->lista_campos_lectura[]=new campo_entidad( 'TELEFONO' 	, 'text' 	, 'Teléfono'  ) ;
 			$this->lista_campos_lectura[]=new campo_entidad( 'Gestion_Tipo' 	, 'fk' 	, 'Gestión' , new gestion_tipo() ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'Tipo_Estab_Nro' 	, 'fk' 	, 'Tipo' , new tipos_de_establecimiento() ) ;
 			$this->lista_campos_lectura[]=new campo_entidad( 'DEPENDENCIA_FUNCIONAL' 	, 'text' 	, 'Dependencia Funcional'  ) ;
 			$this->lista_campos_lectura[]=new campo_entidad( 'Escuela_Ofertas' 	, 'text' 	, 'Ofertas'  ) ;
 			$this->lista_campos_lectura[]=new campo_entidad( 'Escuela_Observaciones' 	, 'textarea' 	, 'Observaciones'  ) ;
@@ -44,7 +46,23 @@ class escuelas_general extends entidadj {
 		}	
 
 
+		protected function arregla_tabla()
+		{
+			$this->strsql = "
+							select llamados.CUE from llamados left join escuelas_general on llamados.CUE = escuelas_general.CUE
+where escuelas_general.CUE is null
 
+							select infraestructura.CUE from infraestructura left join escuelas_general on infraestructura.CUE = escuelas_general.CUE
+where escuelas_general.CUE is null
+			
+							alter table anexo add FOREIGN KEY (CUE) REFERENCES escuelas_general(CUE)
+							alter table capacitaciones add FOREIGN KEY (CUE) REFERENCES escuelas_general(CUE)
+							alter table infraestructura add FOREIGN KEY (CUE) REFERENCES escuelas_general(CUE)
+							alter table llamados add FOREIGN KEY (CUE) REFERENCES escuelas_general(CUE)
+				
+			
+			" ;
+		}
 
 }
 

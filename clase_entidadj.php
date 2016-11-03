@@ -42,10 +42,13 @@ class campo_entidad {
 				if ( $this->tipo == 'time' ) 
 					$ts_valor_sql = '1899-12-30 '.$tv_valor ;
 				else
-					$ts_valor_sql =  " '".$tv_valor."' " ;
+					$ts_valor_sql =  $tv_valor ;
+				//$ts_valor_sql = htmlspecialchars( $ts_valor_sql  ) ;
+				$ts_valor_sql = $this->sanear_string( $ts_valor_sql ) ;
+		
 			}
 		//
-		$ts_valor_sql = htmlspecialchars( $ts_valor_sql ) ;
+		$ts_valor_sql = " '".$ts_valor_sql."' " ;
 		return $ts_valor_sql ; 
 		
 	}
@@ -70,7 +73,76 @@ class campo_entidad {
 		}
 		return $valor_saneado ;
 	}
-		
+	protected function sanear_fecha($string)
+	{
+	 
+		$string = trim($string);
+	 
+		//$string = str_replace(
+		//	array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
+		//	array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
+		//	$string
+		//);
+	 
+	 
+		//Esta parte se encarga de eliminar cualquier caracter extraño
+		$string = str_replace(
+			array("\\" , "¨", "º", "~",
+				 "#",  "|", "!", "\"",
+				 "\·", "\$", "%", "\&", 
+				 "(", ")", "?", "'", "¡",
+				 "¿", "[", "^", "<code>", "]",
+				 "+", "}", "{", "¨", "´",
+				 ">", "<", ";", ",", ":",
+				 "·" , "&" , "=" , "*" ),
+			'', $string );
+		return $string ;
+	}
+	protected function sanear_num($string)
+	{
+		if ( intval($string) <> 0 )
+		{
+			$string = str_replace(
+			array("\\" , "¨", "~",
+				 "|", "\"",
+				 "\·", "\$", "%", "\&", "/",
+				 "'", 
+				 "[", "^", "<code>", "]",
+				 "+", "}", "{", "¨", "´",
+				 ">", "<", ";", ",", ":",
+				 "·" , "&" , "=" , "*" ),
+			'', $string );
+			return $string ;
+		}
+		else
+			return 0 ;
+	}
+	protected function sanear_string($string)
+	{
+	 
+		$string = trim($string);
+	 
+		//$string = str_replace(
+		//	array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
+		//	array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
+		//	$string
+		//);
+	 
+	 
+		//Esta parte se encarga de eliminar cualquier caracter extraño
+		//$string = str_replace(
+			//array("\\" , "¨", "~",
+			//	 "|", "\"",
+			//	 "\·", "\$", "%", "\&", "/",
+			//	 "'", 
+			//	 "[", "^", "<code>", "]",
+			//	 "+", "}", "{", "¨", "´",
+			//	 ">", "<", ";", ",", ":",
+			//	 "·" , "&" , "=" , "*" ),
+			//'', $string );
+		$string = str_replace( array("\\" ,  "\"", "'" ) , '' , $string ) ;
+		return $string ;
+	}
 		
 }
 
@@ -260,8 +332,6 @@ class entidadj {
 			$campo->pone_valor($_POST[$ts_nomCtrl]) ;
 			$i++;
 		}
-		var_dump( $this->lista_campos_lectura ) ;
-		die('<br> leeer post de campos') ;
 	}
 
 	public function texto_actualizar_okGrabar()
@@ -283,7 +353,6 @@ class entidadj {
 				//
 				// Levanta los valores de los campos
 				$this->leer_post_de_campos() ;
-				die('Leyo post de campos') ;
 				//
 				// Arma lista de campos a actualizar
 				$primerCampo = true;
@@ -312,6 +381,7 @@ class entidadj {
 									$primerCampo = false ;
 									
 								}
+							/*
 							//
 							// Nombre de campo
 							$nomCtrl = $this->prefijo_campo.'cpoNro'.$i.'_'  ;
@@ -325,15 +395,20 @@ class entidadj {
 							$strsql .= $campo->nombre(). " = NULL " ;
 							else
 							$strsql .= $campo->nombre(). " = '".$valor."' " ;
+							* 
+							*/
+							$strsql .= $campo->nombre(). ' = ' . $campo->valor_sql() ;
 							}
 						$i++;
 					}
 				$strsql = $strsql.' WHERE '.$where.' ' ;
 				//
 				// Cierra la conexion
+				$cn->conexion->query("SET NAMES 'utf8'");
 				$actualizado = $cn->conexion->query($strsql) ;
 				if( ! $actualizado ) die( "Problemas en el update de ".$this->nombre_tabla." : ".$cn->conexion->error.$strsql ) ;
 				$cn->cerrar();
+				die($strsql) ;
 			}
 		}	
 	public function texto_actualizar()
@@ -386,8 +461,8 @@ class entidadj {
 									if( $this->lista_campos_lectura[$i]->tipo() == 'pk' or $this->lista_campos_lectura[$i]->tipo() == 'otro' )
 										{ 
 											$cpo->pone_tipo( 'text' ) ;
-											$txt .= $cpo->txtMostrarOculto() ;
-											$txt .= $cpo->txtMostrarEtiqueta() ;
+											$txt .= $cpo->txtMostrarOcultoyEtiqueta() ;
+											//$txt .= $cpo->txtMostrarEtiqueta() ;
 										}
 									elseif( $this->lista_campos_lectura[$i]->tipo() == 'fk' )
 										{
