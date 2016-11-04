@@ -408,7 +408,6 @@ class entidadj {
 				$actualizado = $cn->conexion->query($strsql) ;
 				if( ! $actualizado ) die( "Problemas en el update de ".$this->nombre_tabla." : ".$cn->conexion->error.$strsql ) ;
 				$cn->cerrar();
-				die($strsql) ;
 			}
 		}	
 	public function texto_actualizar()

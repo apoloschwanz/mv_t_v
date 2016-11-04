@@ -11,6 +11,12 @@ class gestion_tipo extends Entidadi
 		$this->nombre_tabla = "Tipo de Gestion" ;
 		$this->nombre_fisico_tabla = "gestion_tipo" ;
 	}
+	protected function agregar_tabla()
+	{
+		$this->strsql = " create table gestion_tipo ( Gestion_Tipo VARCHAR(7) NOT NULL PRIMARY KEY , 
+													Gestion_Nombre VARCHAR(55) )
+						" ;
+	}
 	protected function modifica_tabla()
 	{
 		$this->strsql = " RENAME TABLE  `gesti??n_tipo`  TO gestion_tipo ; " ;
