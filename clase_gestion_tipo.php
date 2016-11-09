@@ -19,7 +19,7 @@ class gestion_tipo extends Entidadi
 	}
 	protected function modifica_tabla()
 	{
-		$this->strsql = " RENAME TABLE  `gesti??n_tipo`  TO gestion_tipo ; " ;
+		$this->strsql = " RENAME TABLE  `gestión_tipo`  TO gestion_tipo ; " ;
 		
 		$this->strsql = " ALTER TABLE gestion_tipo CHANGE COLUMN `Gestión_Tipo` `Gestion_Tipo` VARCHAR(7) ; " ;
 		 	 		

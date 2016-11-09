@@ -47,7 +47,180 @@ class tipos_de_establecimiento extends entidadj {
 						" ;
 		
 	}
+	protected function asignacion_tipos()
+	{
+		$this->strsql = "
+						-- 14 -- Escuelas de Nivel Medio públicas
+						-- 15 -- Escuelas de Nivel Medio privadas
+						-- 16 -- Centros Educativos Nivel Secundario (adultos)
+						-- 17 -- Escuelas de Educación Especial (Nivel Medio y Formación Laboral)
+						--  2 -- Centros Educativos Nivel Primario (adultos)
+						--  8 -- Escuelas Primarias de Adultos
+						-- 18 -- Programa Adolescencia
+						--  4 Centros de Educación No Formal
+			
+			
+			update escuelas_general set escuelas_general.Tipo_Estab_Nro = NULL
+			
+			--
+			--  14 -- Escuelas de Nivel Medio públicas
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%media%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 14
+			WHERE escuelas_general.NOMBRE like '%media%'
+			and escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.DEPENDENCIA_FUNCIONAL like '%media%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 14
+			WHERE
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.DEPENDENCIA_FUNCIONAL like '%media%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			--
+			--  16 -- Centros Educativos Nivel Secundario (adultos)
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%cens%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 16
+			WHERE
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%cens%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			--
+			--  17 -- Escuelas de Educación Especial (Nivel Medio y Formación Laboral)
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%especia%'
+			and escuelas_general.Tipo_Estab_Nro is null
+						
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 17
+			 WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%especia%'
+			and escuelas_general.Tipo_Estab_Nro is null
+						
+			--
+			--   2 -- Centros Educativos Nivel Primario (adultos)
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%cenp%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 2
+			 WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%cenp%'
+			and escuelas_general.Tipo_Estab_Nro is null
+						
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.TIPO like '%cenp%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 2
+			 WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.TIPO like '%cenp%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			
+			--
+			--  8 -- Escuelas Primarias de Adultos	
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%adul%'	
+			and escuelas_general.Tipo_Estab_Nro is null	
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 8
+			 WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%adul%'	
+			and escuelas_general.Tipo_Estab_Nro is null	
+			
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.TIPO like '%primaria adultos%'	
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 8
+			 WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.TIPO like '%primaria adultos%'	
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			--
+			--  18 -- Programa Adolescencia
+			
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%adolesc%'	
+			and escuelas_general.Tipo_Estab_Nro is null	
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 18
+			 WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%adolesc%'	
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			--
+			--   4 Centros de Educación No Formal
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.TIPO like '%no formal%'	
+			and escuelas_general.Tipo_Estab_Nro is null	
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 4
+			 WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.TIPO like '%no formal%'	
+			and escuelas_general.Tipo_Estab_Nro is null	
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.TIPO like '%ENF%'	
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 4
+			 WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.TIPO like '%ENF%'	
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+						" ;
 	
+	}
 	
 }
 
