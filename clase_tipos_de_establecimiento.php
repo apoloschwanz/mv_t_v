@@ -50,7 +50,7 @@ class tipos_de_establecimiento extends entidadj {
 	protected function asignacion_tipos()
 	{
 		$this->strsql = "
-						-- 14 -- Escuelas de Nivel Medio públicas
+						-- 14 -- Escuelas de Nivel Medio públicas (tecnicas,normales,boa)
 						-- 15 -- Escuelas de Nivel Medio privadas
 						-- 16 -- Centros Educativos Nivel Secundario (adultos)
 						-- 17 -- Escuelas de Educación Especial (Nivel Medio y Formación Laboral)
@@ -58,7 +58,7 @@ class tipos_de_establecimiento extends entidadj {
 						--  8 -- Escuelas Primarias de Adultos
 						-- 18 -- Programa Adolescencia
 						--  4 Centros de Educación No Formal
-			
+						
 			
 			update escuelas_general set escuelas_general.Tipo_Estab_Nro = NULL
 			
@@ -88,6 +88,63 @@ class tipos_de_establecimiento extends entidadj {
 			and escuelas_general.DEPENDENCIA_FUNCIONAL like '%media%'
 			and escuelas_general.Tipo_Estab_Nro is null
 			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%técnica%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 14
+			WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%técnica%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%normal%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 14
+			WHERE  
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%normal%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%orientación art%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 14
+			WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.NOMBRE like '%orientación art%'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.DEPENDENCIA_FUNCIONAL in
+			('Educación Artística', 
+			 'Formación Docente',
+			 'Dirección de Educación Artística',
+			 'UBA' )
+			 and escuelas_general.Tipo_Estab_Nro is null
+			 
+			 
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 14
+			WHERE  
+			escuelas_general.Gestion_Tipo = 'pública'
+			and escuelas_general.DEPENDENCIA_FUNCIONAL in
+			('Educación Artística', 
+			 'Formación Docente',
+			 'Dirección de Educación Artística',
+			 'UBA' )
+			 and escuelas_general.Tipo_Estab_Nro is null 
+			 
 			--
 			--  16 -- Centros Educativos Nivel Secundario (adultos)
 			
