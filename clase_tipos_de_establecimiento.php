@@ -146,6 +146,19 @@ class tipos_de_establecimiento extends entidadj {
 			 and escuelas_general.Tipo_Estab_Nro is null 
 			 
 			--
+			--  15 -- Escuelas de Nivel Medio privadas
+			 
+			 SELECT * FROM `escuelas_general` WHERE 
+			escuelas_general.Gestion_Tipo = 'privada'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			UPDATE `escuelas_general` 
+			SET escuelas_general.Tipo_Estab_Nro = 15
+			WHERE 
+			escuelas_general.Gestion_Tipo = 'privada'
+			and escuelas_general.Tipo_Estab_Nro is null
+			
+			--
 			--  16 -- Centros Educativos Nivel Secundario (adultos)
 			
 			SELECT * FROM `escuelas_general` WHERE 
