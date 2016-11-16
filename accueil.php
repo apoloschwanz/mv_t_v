@@ -65,6 +65,17 @@
 		$pagina->insertarCuerpo($texto);
 		
 	}
+	if ( $usr->tiene_rol('coordgen') )
+	{
+		//
+		// Escuelas
+		$texto = 		'</td><td align="right" width="80%" ><a href="escuelas.php"> <button class="botonmenu"> Escuelas </button>' ;
+		$pagina->insertarCuerpo($texto);
+		//
+		// Tipos de Establecimiento
+		$texto = 		'</td><td align="right" width="80%" ><a href="tipos_de_establecimiento.php"> <button class="botonmenu"> Tipos de Establecimiento </button>' ;
+		$pagina->insertarCuerpo($texto);
+	}
 	if ( $usr->tiene_rol('admin') )
 	{
 		//
