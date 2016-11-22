@@ -1,5 +1,6 @@
 <?php
 
+require_once 'class_paginaj.php' ;
 
 class campo_entidad {
 	protected $nombre; 
@@ -35,7 +36,7 @@ class campo_entidad {
 		$tv_valor = $this->valor_saneado() ;
 		if ( empty( $tv_valor ) )
 			{
-				$ts_valor_sql = ' NULL ' ;
+				$ts_valor_sql = 'NULL' ;
 			}
 		else
 			{
@@ -45,10 +46,9 @@ class campo_entidad {
 					$ts_valor_sql =  $tv_valor ;
 				//$ts_valor_sql = htmlspecialchars( $ts_valor_sql  ) ;
 				$ts_valor_sql = $this->sanear_string( $ts_valor_sql ) ;
-		
+				$ts_valor_sql = " '".$ts_valor_sql."' " ;
 			}
 		//
-		$ts_valor_sql = " '".$ts_valor_sql."' " ;
 		return $ts_valor_sql ; 
 		
 	}
@@ -159,6 +159,10 @@ class entidadj {
 	protected $okGrabar  ;
 	protected $okReleer  ;
 	protected $okSalir ;
+	protected $okListaSiguiente ;
+	protected $okListaAnterior ;
+	protected $okListaPrimero ;
+	protected $okListaUltimo ;
 	protected $okVer ;
 	public $okExportar ;
 	protected $botones_extra_edicion ;
@@ -308,6 +312,10 @@ class entidadj {
 			$this->okVer=$this->prefijo_campo. '_okVer';
 			$this->okGrabaAgregar= $this->prefijo_campo. '_okGrabaAgregar';
 			$this->okExportar = $this->prefijo_campo. '_okExportar' ;
+			$this->okListaSiguiente = $this->prefijo_campo. '_okListaSiguiente' ;
+			$this->okListaAnterior = $this->prefijo_campo. '_okListaAnterior' ;
+			$this->okListaPrimero = $this->prefijo_campo. '_okListaPrimero' ;
+			$this->okListaUltimo = $this->prefijo_campo. '_okListaUltimo' ;
 			
 			//
 			// Personalizacion de variables
@@ -873,7 +881,7 @@ class entidadj {
 			$botones = '<input type="submit" name="ok" value="Salir" autofocus>';
 			$botones .= '<input type="submit" name="'.$this->okReleer.'" value="Revertir" >';
 			$botones .= '<input type="submit" name="'.$this->okGrabaAgregar.'" value="Agregar" >';
-			$pagina=new Paginai($this->pagina_titulo,$botones);
+			$pagina=new paginaj($this->pagina_titulo,$botones);
 			$txt = 	$this->texto_agregar();
 			$pagina->insertarCuerpo($txt);
 			$pagina->sinborde();
@@ -896,7 +904,7 @@ class entidadj {
 			$botones .= '<input type="submit" name="'.$this->okReleer.'" value="Revertir" >';
 			$botones .= '<input type="submit" name="'.$this->okGrabar.'" value="Grabar" >';
 			$botones .= $btn_extra ;
-			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
+			$pagina = new paginaj($this->pagina_titulo,$hidden.$botones) ;
 			$pagina->sinborde();
 			//
 			// Muestra la cabecera
@@ -913,7 +921,7 @@ class entidadj {
 			$hidden = '<input type="hidden" name="'.$this->prefijo_campo.'_id'.'" value="'.$this->id.'" > ' ;
 			$botones = '<input type="submit" name="ok" value="Volver" autofocus>';
 			$botones .= '<input type="submit" name="'.$this->okGrabaBorrarUno.'" value="Borrar" >';
-			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
+			$pagina = new paginaj($this->pagina_titulo,$hidden.$botones) ;
 			$pagina->sinborde();
 			//
 			// Subtitulo
@@ -935,7 +943,7 @@ class entidadj {
 			// Muestra pantalla para editar datos
 			$hidden = '<input type="hidden" name="'.$this->prefijo_campo.'_id'.'" value="'.$this->id.'" > ' ;
 			$botones = '<input type="submit" name="ok" value="Volver" autofocus>';
-			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
+			$pagina = new paginaj($this->pagina_titulo,$hidden.$botones) ;
 			$pagina->sinborde();
 			//
 			// Muestra la cabecera
@@ -1040,6 +1048,30 @@ class entidadj {
 				if ( $this->hay_error() == true ) $this->muestra_error() ;
 				else $this->muestra_ok('Registro # '.$this->id().' eliminado') ;
 			}
+			elseif ( isset($_POST[$this->okListaSiguiente]) )
+			{
+				//
+				// Mostrar Lista Siguiente
+				die('Mostrar Lista Siguiente');
+			}
+			elseif ( isset($_POST[$this->okListaAnterior]) )
+			{
+				//
+				// Mostrar Lista Anterior
+				die('Mostrar Lista Anterior');
+			}
+			elseif ( isset($_POST[$this->okListaPrimero]) )
+			{
+				//
+				// Mostrar Lista Primero
+				die('Mostrar Lista Primero');
+			}
+			elseif ( isset($_POST[$this->okListaUltimo]) )
+			{
+				//
+				// Mostrar Lista Ultimo
+				die('Mostrar Lista Ultimo');
+			}
 			else
 			{
 				$this->mostrar_lista_abm() ;
@@ -1049,7 +1081,7 @@ class entidadj {
 		public function mostrar_lista_abm()
 		{
 			$hidden = '' ;
-			$pagina = new Paginai($this->nombre_tabla ,$hidden.'<input type="submit" name="'.$this->okSalir.'" value="Salir" autofocus>') ;
+			$pagina = new paginaj($this->nombre_tabla ,$hidden.'<input type="submit" name="'.$this->okSalir.'" value="Salir" autofocus>') ;
 			//
 			// Muestra la cabecera
 			$texto = $this->texto_mostrar_abm() ;
@@ -1062,7 +1094,7 @@ class entidadj {
 		{
 			$hidden = '' ;
 			$botones = '<input type="submit" name="ok" value="Ok" autofocus>';
-			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
+			$pagina = new paginaj($this->pagina_titulo,$hidden.$botones) ;
 			$pagina->sinborde();
 			//
 			// Muestra el error
@@ -1076,7 +1108,7 @@ class entidadj {
 		{
 			$hidden = '' ;
 			$botones = '<input type="submit" name="ok" value="Ok" autofocus>';
-			$pagina = new Paginai($this->pagina_titulo,$hidden.$botones) ;
+			$pagina = new paginaj($this->pagina_titulo,$hidden.$botones) ;
 			$pagina->sinborde();
 			//
 			// Muestra el error
@@ -1722,8 +1754,13 @@ class entidadj {
 				{ 
 					//$txt=$txt.'<tr><td colspan="'.$cntcols.'">';
     			//$txt=$txt.'<input type="submit" value="Agregar" name="'.$this->prefijo_campo.'_okAgregar">';
+    			if ( $this->borrar_con_seleccion )
     			$txt=$txt.'<input type="submit" value="Borrar" name="'.$this->prefijo_campo.'_okBorrar">';
     			//$txt=$txt.'</td></tr>'; 
+    			$txt=$txt.'<input type="submit" value="<<" name="'.$this->okListaPrimero.'">';
+				$txt=$txt.'<input type="submit" value="<" name="'.$this->okListaAnterior.'">';
+				$txt=$txt.'<input type="submit" value=">" name="'.$this->okListaSiguiente.'">';
+				$txt=$txt.'<input type="submit" value=">>" name="'.$this->okListaUltimo.'">';
 				}
 			else
 				{

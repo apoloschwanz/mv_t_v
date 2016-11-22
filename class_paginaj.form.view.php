@@ -17,12 +17,14 @@
 							<tr>
 								<td align="center">
 									<!-- comienzo detalle -->
-									<table class="<?php echo $this->clase_tabladet?>">
+									<table class="<?php echo $this->clase_tabladet()?>">
 										<!-- comienzo cuerpo -->
 										<?php echo $this->graficar_cuerpo() ; ?>
 										<!-- fin cuerpo -->
 										<tr>
-											<td style="text-align:center"><?php echo $this->pie ?>
+											<td style="text-align:center">
+												<?php echo $this->pie ; ?>
+												<?php echo $this->graficar_valores_ocultos() ; ?>
 											</td>
 										</tr>
 									</table>

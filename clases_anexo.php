@@ -1103,6 +1103,28 @@ WHERE anexo.anexo_Nro = '".$this->id."' "  ;
 			
 			
 		}
+		protected function cambia_preguntas_anexo_a_participacion()
+		{
+				$strsql = "
+				
+				SET @mianexo = 9340;
+				
+				DELETE FROM `respuestas_del_anexo` WHERE Anexo_Nro = @mianexo and Pregunta_Cod 
+											in ( 23 , 25 , 26 , 27 ,28 , 29 , 30 , 31 , 32 , 33 );
+				
+				INSERT INTO respuestas_del_anexo (Anexo_Nro, Pregunta_Cod, Respuesta_Cod, Pregunta_Nro) 
+					VALUES 
+					( @mianexo,'54', NULL, '7'),
+					( @mianexo,'55', NULL, '7'),
+					( @mianexo,'56', NULL, '7'),
+					( @mianexo,'57', NULL, '7');
+				
+				update respuestas_del_anexo set Pregunta_Nro = 6 where Anexo_Nro = @mianexo and Pregunta_Cod = 
+				53 ;
+				
+				
+				" ;
+		}
 		protected function cambia_preguntas_anexo_a_mivoto()
 		{
 				$strsql = "

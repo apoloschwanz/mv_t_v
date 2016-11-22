@@ -16,7 +16,7 @@
 						<tr>
 							<td align="center">
 								<!-- comienzo detalle -->
-								<table class="<?php echo $this->clase_tabladet?>">
+								<table class="<?php echo $this->clase_tabladet()?>">
 									<!-- comienzo cuerpo -->
 									<?php echo $this->graficar_cuerpo() ; ?>
 								    <!-- fin cuerpo -->

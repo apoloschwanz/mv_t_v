@@ -10,10 +10,22 @@ class Campo {
 	protected $colspan_dato ;
 	protected $mostrar_nulo ;
 	protected $autofocus ;
-	public function __construct()
+	public function nombre()
 	{
+		return $this->nombre ;
+	}
+	public function valor()
+	{
+		return $this->valor ;
+	}
+	public function __construct($nombre=NULL, $valor=NULL, $tipo='text')
+	{
+		$this->nombre = $nombre ;
+		$this->valor = $valor ;
+		$this->tipo = $tipo ;
 		$this->colspan_dato = 1 ;
 		$this->autofocus = '' ;
+		$this->en_celda = true ; 
 	}
 	public function pone_autofocus()
 	{
@@ -156,13 +168,13 @@ class Campo {
 	public function txtMostrarOculto()
 	{
 				$txt='';
-				$txt.='<td>' ;
+				if ( $this->en_celda ) $txt.='<td>' ;
 				$txt.='<input ' ;
 				$txt.=' name="'.$this->nombre.'" ' ;
 				$txt.=' type="hidden" ' ;
 				$txt.=' value="'.$this->valor.'" ' ;
 				$txt.='>' ;
-				$txt.='</td>';
+				if ( $this->en_celda ) $txt.='</td>';
 		return $txt ;
 	}
 	public function txtMostrarOcultoyEtiqueta()
