@@ -1777,13 +1777,6 @@ class entidadj {
     			if ( $this->borrar_con_seleccion )
     			$txt=$txt.'<input type="submit" value="Borrar" name="'.$this->prefijo_campo.'_okBorrar">';
     			//$txt=$txt.'</td></tr>'; 
-    			$txt=$txt.'<input type="submit" value="<<" name="'.$this->okListaPrimero.'">';
-    			if ( $this->desde > 0 )
-				$txt=$txt.'<input type="submit" value="<" name="'.$this->okListaAnterior.'">';
-				else
-				$txt=$txt.'<input type="submit" value="<"  disabled >';
-				
-				$txt=$txt.'<input type="submit" value=">" name="'.$this->okListaSiguiente.'">';
 				//$txt=$txt.'<input type="submit" value=">>" name="'.$this->okListaUltimo.'">';
 				}
 			else
@@ -1792,6 +1785,13 @@ class entidadj {
     			//$txt=$txt.'<input type="submit" value="Agregar" name="'.$this->prefijo_campo.'_okAgregar">';
     			//$txt=$txt.'</td></tr>'; 
 				}
+			$txt=$txt.'<input type="submit" value="<<" name="'.$this->okListaPrimero.'">';
+			if ( $this->desde > 0 )
+				$txt=$txt.'<input type="submit" value="<" name="'.$this->okListaAnterior.'">';
+			else
+			$txt=$txt.'<input type="submit" value="<"  disabled >';
+			if ( $this->existe == true )
+				$txt=$txt.'<input type="submit" value=">" name="'.$this->okListaSiguiente.'">';
 			foreach( $this->botones_extra_abm as $boton )
 			{
 				$txt.='<input type="submit" value="'.$boton['texto'].'" name="'.$boton['nombre'].'">';
