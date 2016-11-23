@@ -10,6 +10,7 @@ class Campo {
 	protected $colspan_dato ;
 	protected $mostrar_nulo ;
 	protected $autofocus ;
+	protected $en_celda ;
 	public function nombre()
 	{
 		return $this->nombre ;
@@ -17,6 +18,10 @@ class Campo {
 	public function valor()
 	{
 		return $this->valor ;
+	}
+	public function sin_celda()
+	{
+		$this->en_celda = false ;
 	}
 	public function __construct($nombre=NULL, $valor=NULL, $tipo='text')
 	{

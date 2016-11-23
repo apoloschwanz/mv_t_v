@@ -164,6 +164,7 @@ class entidadj {
 	protected $okListaPrimero ;
 	protected $okListaUltimo ;
 	protected $okVer ;
+	protected $okListaPosicion;
 	public $okExportar ;
 	protected $botones_extra_edicion ;
 /////////////////////////////////////-------- variables de la clase entidad --------- //////////////////////////////////
@@ -238,7 +239,7 @@ class entidadj {
 		//
 		// Paginacion
 		$this->desde = 0 ;																					// by DZ 2015-08-14 - agregado lista de datos
-		$this->cuenta = 15 ;																				// by DZ 2015-08-14 - agregado lista de datos		
+		$this->cuenta = 10 ;																				// by DZ 2015-08-14 - agregado lista de datos		
 		//
 		// Acciones Extra para texto_mostrar_abm
 		//$this->acciones = array( 'nombre'=>'okAsignarDte' , 'texto'=>'AsignarDte' ) ;
@@ -316,6 +317,8 @@ class entidadj {
 			$this->okListaAnterior = $this->prefijo_campo. '_okListaAnterior' ;
 			$this->okListaPrimero = $this->prefijo_campo. '_okListaPrimero' ;
 			$this->okListaUltimo = $this->prefijo_campo. '_okListaUltimo' ;
+			$this->okListaPrimero = $this->prefijo_campo. '_okListaPrimero' ;
+			$this->okListaPosicion = $this->prefijo_campo. '_okListaPosicion' ;
 			
 			//
 			// Personalizacion de variables
@@ -882,6 +885,7 @@ class entidadj {
 			$botones .= '<input type="submit" name="'.$this->okReleer.'" value="Revertir" >';
 			$botones .= '<input type="submit" name="'.$this->okGrabaAgregar.'" value="Agregar" >';
 			$pagina=new paginaj($this->pagina_titulo,$botones);
+			$pagina->pone_valor_oculto( $this->okListaPosicion , $this->desde );
 			$txt = 	$this->texto_agregar();
 			$pagina->insertarCuerpo($txt);
 			$pagina->sinborde();
@@ -977,6 +981,13 @@ class entidadj {
 				}
 			}
 			//
+			// Post Generales
+			if (isset($_REQUEST[$this->okListaPosicion]))
+			  $this->desde = $_REQUEST[$this->okListaPosicion];
+			else
+			  $this->desde=0;
+			
+			//
 			// Acciones Clasicas 
 			
 			/* by dz 2016-10-25 $okVer = $this->obtiene_prefijo_campo().'okVer' ;
@@ -1052,25 +1063,29 @@ class entidadj {
 			{
 				//
 				// Mostrar Lista Siguiente
-				die('Mostrar Lista Siguiente');
+				$this->desde += $this->cuenta ;
+				$this->mostrar_lista_abm() ;
 			}
 			elseif ( isset($_POST[$this->okListaAnterior]) )
 			{
 				//
 				// Mostrar Lista Anterior
-				die('Mostrar Lista Anterior');
+				$this->desde -= $this->cuenta ;
+				$this->mostrar_lista_abm() ;
 			}
 			elseif ( isset($_POST[$this->okListaPrimero]) )
 			{
 				//
 				// Mostrar Lista Primero
-				die('Mostrar Lista Primero');
+				$this->desde = 0 ;
+				$this->mostrar_lista_abm() ;
 			}
 			elseif ( isset($_POST[$this->okListaUltimo]) )
 			{
 				//
 				// Mostrar Lista Ultimo
 				die('Mostrar Lista Ultimo');
+				$this->mostrar_lista_abm() ;
 			}
 			else
 			{
@@ -1082,6 +1097,7 @@ class entidadj {
 		{
 			$hidden = '' ;
 			$pagina = new paginaj($this->nombre_tabla ,$hidden.'<input type="submit" name="'.$this->okSalir.'" value="Salir" autofocus>') ;
+			$pagina->pone_valor_oculto( $this->okListaPosicion , $this->desde ) ;
 			//
 			// Muestra la cabecera
 			$texto = $this->texto_mostrar_abm() ;
@@ -1348,6 +1364,10 @@ class entidadj {
 		}
 		// <--
 		// by dz 2016-10-24
+		if ( empty( $this->desde ) or $this->desde < 0 )
+			$this->desde = 0 ;
+		if ( $this->cuenta )
+			$this->strsql .= ' LIMIT '. $this->desde . ' , ' . $this->cuenta ;
 	}
 	public function Leer()
 	{ $this->Carga_Sql_Lectura();		
@@ -1758,9 +1778,13 @@ class entidadj {
     			$txt=$txt.'<input type="submit" value="Borrar" name="'.$this->prefijo_campo.'_okBorrar">';
     			//$txt=$txt.'</td></tr>'; 
     			$txt=$txt.'<input type="submit" value="<<" name="'.$this->okListaPrimero.'">';
+    			if ( $this->desde > 0 )
 				$txt=$txt.'<input type="submit" value="<" name="'.$this->okListaAnterior.'">';
+				else
+				$txt=$txt.'<input type="submit" value="<"  disabled >';
+				
 				$txt=$txt.'<input type="submit" value=">" name="'.$this->okListaSiguiente.'">';
-				$txt=$txt.'<input type="submit" value=">>" name="'.$this->okListaUltimo.'">';
+				//$txt=$txt.'<input type="submit" value=">>" name="'.$this->okListaUltimo.'">';
 				}
 			else
 				{
