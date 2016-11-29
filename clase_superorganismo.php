@@ -1,0 +1,26 @@
+<?php
+
+require_once 'clase_entidadj.php' ;
+require_once 'clase_superorganismotipo.php' ;
+
+class superorganismo extends entidadj {
+	protected function Pone_Datos_Fijos_No_Heredables()
+	{
+		$this->nombre_fisico_tabla = 'super_organismo' ;
+		$this->nombre_tabla = 'Super-organismo' ;
+		$this->lista_campos_lista=array();
+		$this->lista_campos_lista[]=new campo_entidad( 'SuperOrganismo_Id' 			, 'pk' 		, '#' ) ;
+		$this->lista_campos_lista[]=new campo_entidad( 'SuperOrganismo' 	, 'text' 	, 'Organismo'  ) ;
+		$this->lista_campos_lista[1]->pone_busqueda() ;
+		//
+		//
+		$this->lista_campos_lectura=array();
+		$this->lista_campos_lectura[]=new campo_entidad( 'SuperOrganismo_Id' 			, 'pk' 		, '#' ) ;
+		$this->lista_campos_lectura[]=new campo_entidad( 'SuperOrganismo' 	, 'text' 	, 'Organismo'  ) ;
+		$this->lista_campos_lectura[]=new campo_entidad( 'Tipo' 	, 'number' 	, 'Tipo' , new superorganismotipo()  ) ;
+	}
+
+	
+}
+
+?>

@@ -10,7 +10,7 @@
 	require_once 'clase_personas.php' ;
 	//
 	// Instancia Entidad
-	$pagina = new personas() ;
+	$pagina = new persona() ;
 	
 	//
 	// Mustra Pagina Web de la entidad

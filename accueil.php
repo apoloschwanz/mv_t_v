@@ -44,6 +44,10 @@
 		// Programas en desarrollo
 		//
 		//
+		// Personas
+		$texto = 		'</td><td align="right" width="80%" ><a href="personas.php"> <button class="botonmenu"> Personas </button>' ;
+		$pagina->insertarCuerpo($texto);
+		//
 		// Llamados
 		$texto = 		'</td><td align="right" width="80%" ><a href="llamados_resumen_capas.php"> <button class="botonmenu"> Llamados </button>' ;
 		$pagina->insertarCuerpo($texto);
