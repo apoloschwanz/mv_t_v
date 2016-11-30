@@ -6,7 +6,7 @@ require_once 'clase_superorganismo.php' ;
 class organismo extends entidadj {
 	protected function Pone_Datos_Fijos_No_Heredables()
 	{
-		$this->nombre_fisico_tabla = 'organismo' ;
+		$this->nombre_fisico_tabla = 'organismos' ;
 		$this->nombre_tabla = 'Organismo' ;
 		$this->lista_campos_lista=array();
 		$this->lista_campos_lista[]=new campo_entidad( 'Organismo_ID' 			, 'pk' 		, '#' ) ;
