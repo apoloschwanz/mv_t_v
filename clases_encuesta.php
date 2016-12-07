@@ -683,6 +683,86 @@ class Respuestas_de_la_Encuesta extends Entidad {
 		
 				" ;
 	}
+	protected function conjunto_de_respuestas()
+	{
+		$this->strsql = "
+							drop table conjunto_de_respuestas_x_edicion ;
+							create table conjunto_de_respuestas_x_edicion as
+							SELECT
+								capacitaciones.Programa_Nro ,
+								anexo.Edicion_Nro,
+								encuestas.Tipo_de_Encuesta_Cod,
+								respuestas_de_la_encuesta.Pregunta_Nro as Pregunta_Nro,
+								preguntas.Pregunta_Cod,
+								preguntas.Pregunta,
+								respuestas_de_la_encuesta.Respuesta_Cod as Respuesta ,
+								count(*) as cantidad,
+								0 as Invalida
+								from 
+								respuestas_de_la_encuesta
+								inner join preguntas
+									on preguntas.Pregunta_Cod = respuestas_de_la_encuesta.Pregunta_Cod
+								inner join encuestas
+									on encuestas.Nro_Encuesta = respuestas_de_la_encuesta.Nro_Encuesta
+								inner join anexo
+									on encuestas.Anexo_Nro = anexo.Anexo_Nro
+								inner join capacitaciones
+									on capacitaciones.Anexo_Nro = anexo.Anexo_Nro
+								where anexo.Edicion_Nro = 2016
+								group by
+									capacitaciones.Programa_Nro ,
+									anexo.Edicion_Nro,
+									encuestas.Tipo_de_Encuesta_Cod,
+									respuestas_de_la_encuesta.Pregunta_Nro ,
+									preguntas.Pregunta_Cod,
+									respuestas_de_la_encuesta.Respuesta_Cod 
+								order by
+									capacitaciones.Programa_Nro ,
+									anexo.Edicion_Nro,
+									encuestas.Tipo_de_Encuesta_Cod,
+									respuestas_de_la_encuesta.Pregunta_Nro ,
+									preguntas.Pregunta_Cod,
+									respuestas_de_la_encuesta.Respuesta_Cod ;
+						
+						alter TABLE `conjunto_de_respuestas_x_edicion` ADD ( Invalido Int ) ;
+								
+								
+						" ;
+	}
+	protected function encuesta_extendida()
+	{
+		$this->strsql = "
+							create table tmp_encuesta_extendida_auto_1 as
+							SELECT
+								encuestas.Tipo_de_Encuesta_Cod,
+								encuestas.Nro_Encuesta as Nro,
+								respuestas_de_la_encuesta.Pregunta_Nro as Pregunta_Nro,
+								preguntas.Pregunta_Cod,
+								preguntas.Pregunta,
+								respuestas_de_la_encuesta.Respuesta_Cod as Respuesta ,
+								respuestas_de_la_encuesta.Respuesta_Texto as Textual,
+								anexo.Anios_y_Cursos_Capacitados,
+								encuestas.Nro_Encuesta , anexo.Anexo_Nro ,
+								capacitaciones.Programa_Nro ,
+								escuelas_general.NOMBRE
+								from 
+								respuestas_de_la_encuesta
+								inner join preguntas
+									on preguntas.Pregunta_Cod = respuestas_de_la_encuesta.Pregunta_Cod
+								inner join encuestas
+									on encuestas.Nro_Encuesta = respuestas_de_la_encuesta.Nro_Encuesta
+								inner join anexo
+									on encuestas.Anexo_Nro = anexo.Anexo_Nro
+								inner join capacitaciones
+									on capacitaciones.Anexo_Nro = anexo.Anexo_Nro
+								left join escuelas_general
+									on anexo.CUE = escuelas_general.CUE
+								where anexo.Edicion_Nro = 2016 and encuestas.Tipo_de_Encuesta_Cod = 'Autoridad_'
+								and capacitaciones.Programa_Nro = 1
+								order by encuestas.Nro_Encuesta,respuestas_de_la_encuesta.Pregunta_Nro,
+								respuestas_de_la_encuesta.Pregunta_Cod
+						" ;
+	}
 	protected function textuales_observaciones()
 		{
 			$this->strsql = "
