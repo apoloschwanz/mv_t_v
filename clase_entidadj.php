@@ -210,24 +210,37 @@ class entidadj {
 			//
 			// tipos:  'pk' 'fk' 'otro' 'date' 'datetime' 'time' 'number' 'email' 'url' 'password'
 			//								el tipo 'fk' espera que se defina una clase 
-			$this->clave_manual_activar();
+			$this->clave_manual_activar() ; // La clave de la entidad se ingresa manualment
 			$this->lista_campos_lista=array();
-			$this->lista_campos_lista[]=array( 'nombre'=>'id' 			, 'tipo'=>'pk' 		, 'descripcion'=>'Identificador' , 'clase'=>NULL ) ;
-			$this->lista_campos_lista[]=array( 'nombre'=>'descrip' 	, 'tipo'=>'text' 	, 'descripcion'=>'Identificador' , 'clase'=>NULL ) ;
-			//$this->lista_campos_lista[]=array( 'nombre'=>'descrip' 	, 'tipo'=>'text' 	, 'descripcion'=>'Identificador' , 'clase'=>new Entidadi() ) ;
+			
+			$this->lista_campos_lista[]=new campo_entidad( 'CUE' 			, 'pk' 		, 'Codigo Estab.' , NULL ,true) ;
+			$this->lista_campos_lista[0]->pone_busqueda() ;
+			$this->lista_campos_lista[]=new campo_entidad( 'NOMBRE' 	, 'text' 	, 'Establecimiento'  ) ;
+			$this->lista_campos_lista[1]->pone_busqueda() ;
+			$this->lista_campos_lista[]=new campo_entidad( 'DOMICILIO' 	, 'text' 	, 'Direccion'  ) ;
+			$this->lista_campos_lista[2]->pone_busqueda() ;
+			$this->lista_campos_lista[]=new campo_entidad( 'TELEFONO' 	, 'text' 	, 'Teléfono'  ) ;
+			$this->lista_campos_lista[]=new campo_entidad( 'Gestion_Tipo' 	, 'text' 	, 'Gestión'  ) ;
 			//
 			//
 			$this->lista_campos_lectura=array();
-			$this->lista_campos_lectura[]=array( 'nombre'=>'id' 			, 'tipo'=>'pk' 		, 'descripcion'=>'Identificador' , 'clase'=>NULL ) ;
-			$this->lista_campos_lectura[]=array( 'nombre'=>'descrip' 	, 'tipo'=>'text' 	, 'descripcion'=>'Identificador' , 'clase'=>NULL ) ;
-			//$this->lista_campos_lectura[]=array( 'nombre'=>'descrip' 	, 'tipo'=>'text' 	, 'descripcion'=>'Identificador' , 'clase'=>new Entidadi() ) ;
-						
+			$this->lista_campos_lectura[]=new campo_entidad( 'CUE' 			, 'pk' 		, 'Codigo Estab.'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'NOMBRE' 	, 'text' 	, 'Establecimiento'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'DOMICILIO' 	, 'text' 	, 'Direccion'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'TELEFONO' 	, 'text' 	, 'Teléfono'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'Gestion_Tipo' 	, 'fk' 	, 'Gestión' , new gestion_tipo() ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'Tipo_Estab_Nro' 	, 'fk' 	, 'Tipo' , new tipos_de_establecimiento() ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'DEPENDENCIA_FUNCIONAL' 	, 'text' 	, 'Dependencia Funcional'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'Escuela_Ofertas' 	, 'text' 	, 'Ofertas'  ) ;
+			$this->lista_campos_lectura[]=new campo_entidad( 'Escuela_Observaciones' 	, 'textarea' 	, 'Observaciones'  ) ;
 			//
 			// Nombre de la tabla
-			$this->nombre_tabla = "Nombre de la_tabla" ;
-			$this->nombre_fisico_tabla = "nombre_de_la_tabla" ;
+			$this->nombre_tabla = "Establecimientos" ;
+			$this->nombre_fisico_tabla = "escuelas_general" ;																		
 			//
-		}
+			//
+		}	
+
 	protected function Pone_Datos_Fijos_Personalizables()
 	{
 		//
