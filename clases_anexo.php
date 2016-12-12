@@ -1103,6 +1103,28 @@ WHERE anexo.anexo_Nro = '".$this->id."' "  ;
 			
 			
 		}
+		protected function cambia_preguntas_anexo_a_participacion()
+		{
+				$strsql = "
+				
+				SET @mianexo = 9340;
+				
+				DELETE FROM `respuestas_del_anexo` WHERE Anexo_Nro = @mianexo and Pregunta_Cod 
+											in ( 23 , 25 , 26 , 27 ,28 , 29 , 30 , 31 , 32 , 33 );
+				
+				INSERT INTO respuestas_del_anexo (Anexo_Nro, Pregunta_Cod, Respuesta_Cod, Pregunta_Nro) 
+					VALUES 
+					( @mianexo,'54', NULL, '7'),
+					( @mianexo,'55', NULL, '7'),
+					( @mianexo,'56', NULL, '7'),
+					( @mianexo,'57', NULL, '7');
+				
+				update respuestas_del_anexo set Pregunta_Nro = 6 where Anexo_Nro = @mianexo and Pregunta_Cod = 
+				53 ;
+				
+				
+				" ;
+		}
 		protected function cambia_preguntas_anexo_a_mivoto()
 		{
 				$strsql = "
@@ -1171,6 +1193,19 @@ WHERE anexo.anexo_Nro = '".$this->id."' "  ;
 			  update encuestas Set Anexo_Nro = 10004 where Anexo_Nro = 10268 	;
 				
 				' ;
+		}
+		protected function z_consulta_anexos_sin_encuestas_cargadas()
+		{
+			$this->strsql = "
+					select anexo.Anexo_Nro,anexo.Fecha, count( encuestas.Nro_Encuesta ) , encuestas.Tipo_de_Encuesta_Cod, capacitaciones.Programa_Nro
+					from anexo
+					left join encuestas on encuestas.Anexo_Nro = anexo.Anexo_Nro
+					left join escuelas_general on anexo.CUE = escuelas_general.CUE
+					left join capacitaciones on capacitaciones.Anexo_Nro = anexo.Anexo_Nro
+					where anexo.Edicion_Nro = 2016 and anexo.Fecha = '2016-10-03' 
+					group by anexo.Anexo_Nro,anexo.Fecha,encuestas.Tipo_de_Encuesta_Cod
+					order by capacitaciones.Programa_Nro,anexo.Anexo_Nro,encuestas.Tipo_de_Encuesta_Cod
+							" ;
 		}
 }
 ?>

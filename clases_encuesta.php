@@ -250,6 +250,7 @@ class Encuesta extends Entidad {
 			" ;
 			
 		}
+		
 }
 
 
@@ -682,6 +683,31 @@ class Respuestas_de_la_Encuesta extends Entidad {
 		
 				" ;
 	}
+	protected function textuales_observaciones()
+		{
+			$this->strsql = "
+							SELECT 
+								respuestas_de_la_encuesta.Respuesta_Texto as Textual,
+								anexo.Anios_y_Cursos_Capacitados,
+								encuestas.Nro_Encuesta , anexo.Anexo_Nro ,
+								encuestas.Tipo_de_Encuesta_Cod,
+								capacitaciones.Programa_Nro ,
+								escuelas_general.NOMBRE
+								from 
+								respuestas_de_la_encuesta 
+								inner join encuestas
+									on encuestas.Nro_Encuesta = respuestas_de_la_encuesta.Nro_Encuesta
+								inner join anexo
+									on encuestas.Anexo_Nro = anexo.Anexo_Nro
+								inner join capacitaciones
+									on capacitaciones.Anexo_Nro = anexo.Anexo_Nro
+								left join escuelas_general
+									on anexo.CUE = escuelas_general.CUE
+								where anexo.Edicion_Nro = 2016
+								and respuestas_de_la_encuesta.Respuesta_Texto > ''
+								order by respuestas_de_la_encuesta.Respuesta_Texto desc
+							" ;
+		}
 	
 }
 

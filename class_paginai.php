@@ -99,8 +99,8 @@ class Paginai {
 		{
 			$this->cabecera->graficar_nb();
 		}
-    $this->cuerpo->graficar();
-    $this->pie->graficar();
+		$this->cuerpo->graficar();
+		$this->pie->graficar();
 		$this->formulario->graficar_cierre();
 		$this->fin->graficar() ;
   }
