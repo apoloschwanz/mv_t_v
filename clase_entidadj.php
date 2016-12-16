@@ -10,6 +10,7 @@ class campo_entidad {
 	protected $mostrar ;
 	protected $busqueda ;
 	protected $valor ;
+	protected $readonly ;
 	public function __construct($nombre_del_campo,$tipo = 'text',$descripcion=NULL,$objeto_del_campo=NULL,$forzar_mostrar=false)
 	{
 		$this->nombre = $nombre_del_campo ;
@@ -21,6 +22,7 @@ class campo_entidad {
 		else
 			$this->mostrar = true ;
 		$this->busqueda = false ;
+		$this->readonly = false ;
 	}
 	public function nombre() { return $this->nombre ; }
 	public function tipo() { return $this->tipo ; }
@@ -31,6 +33,8 @@ class campo_entidad {
 	public function busqueda() { return $this->busqueda ; }
 	public function pone_valor($valor) { $this->valor = $valor ; }
 	public function valor() { return $this->valor ; }
+	public function pone_readonly() { $this->readonly = true ;}
+	public function readonly() { return $this->readonly ; }
 	public function valor_sql()
 	{
 		$tv_valor = $this->valor_saneado() ;
@@ -242,7 +246,7 @@ class entidadj {
 		$this->cuenta = 10 ;																				// by DZ 2015-08-14 - agregado lista de datos		
 		//
 		// Acciones Extra para texto_mostrar_abm
-		//$this->acciones = array( 'nombre'=>'okAsignarDte' , 'texto'=>'AsignarDte' ) ;
+		//$this->acciones[] = array( 'nombre'=>'okAsignarDte' , 'texto'=>'AsignarDte' ) ;
 		//
 		// Botones Extra para texto_mostrar_abm
 		//$this->botones_extra_abm[] = array( 'nombre'=>$this->prefijo_campo.'_okExportar' , 'texto'=>'Exportar' ) ;
@@ -273,9 +277,9 @@ class entidadj {
 				$tts_aux .= '<br> Modifique el evento maneja_evento_accion_especial ' ;
 				die( $tts_aux ) ;
 		}
-		//
-		// Funciones que no hace falta redefinir
-		//
+	//
+	// Funciones que no hace falta redefinir
+	//
 	public function __construct()
   	{
 			//
@@ -703,7 +707,7 @@ class entidadj {
 						$txt .= $cpo->txtMostrarOculto() ;
 						$txt = $txt.$cpo->txtMostrarEtiqueta() ;
 					}
-					elseif( $this->lista_campos_lectura[$i]->tipo() == 'otro' )
+					elseif( $this->lista_campos_lectura[$i]->tipo() == 'otro' or $this->lista_campos_lectura[$i]->readonly() )
 						{ 
 							$cpo->pone_tipo( 'text' ) ;
 							$txt = $txt.$cpo->txtMostrarEtiqueta() ;
@@ -1092,6 +1096,43 @@ class entidadj {
 				$this->mostrar_lista_abm() ;
 			}
 		}
+		public function mostrar_pagina_alta()
+		{	
+			//
+			//
+			if ( isset( $_POST[$this->okSalir] ) )
+			{
+				$this->ok_Salir() ;
+			}
+			elseif ( isset( $_POST[$this->okGrabaAgregar] ) )
+			{
+				// Graba Modificaciones
+				$this->texto_agregar_okGrabar();
+				if ( $this->hay_error() == true ) $this->muestra_error() ;
+				else $this->muestra_ok('Registro # '.$this->id().' agregado') ;
+			}
+			elseif ( isset($_REQUEST['okSalir'] ) )
+			{
+				$this->ok_Salir() ;
+			}
+			else
+			{
+				//
+				// Arma la página para agregar		
+				$pagina=new Paginaj($this->nombre_tabla ,'<input type="submit" value="Grabar" name="'.$this->okGrabaAgregar.'"><input type="submit" value="Salir" name="'.$this->okSalir.'">');
+				//$txt = $this->texto_Ver_Lado_Uno();
+				//$pagina->insertarCuerpo($txt);
+				
+				$txt = $this->texto_mostrar_abm() ;
+				$pagina->insertarCuerpo($txt);
+				//
+				$txt = 	$this->texto_agregar();
+				$pagina->insertarCuerpo($txt);
+				$pagina->graficar_c_form($_SERVER['PHP_SELF']);
+				
+
+			}
+		}
 
 		public function mostrar_lista_abm()
 		{
@@ -1369,6 +1410,23 @@ class entidadj {
 		if ( $this->cuenta )
 			$this->strsql .= ' LIMIT '. $this->desde . ' , ' . $this->cuenta ;
 	}
+	public function ejecuta_sql()
+	{ 		
+		$cn=new Conexion();
+		$this->registros=mysqli_query($cn->conexion,$this->strsql) or
+				die("Problemas en el sql de".$this->nombre_tabla.": ".mysqli_error($cn->conexion). " id = ".$this->id. " <br><br> Sql= ".$this->strsql );
+		$cn->cerrar();
+		/*if ( $this->registro=mysqli_fetch_array($this->registros) )
+			{
+				$this->existe = true ;
+				mysqli_data_seek ( $this->registros , 0 ) ;	
+			}
+		else
+			{
+				$this->existe = false ;
+			}
+		*/
+	}	
 	public function Leer()
 	{ $this->Carga_Sql_Lectura();		
 		$cn=new Conexion();
@@ -1761,7 +1819,7 @@ class entidadj {
 				}
 				foreach( $this->acciones as $accion )
 					{
-						//$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->prefijo_campo.$accion['nombre'].'=1">'.$accion['texto'].'</a>' ;
+						$txt=$txt.' <a href="'.$this->nombre_pagina.'?'.$this->prefijo_campo.'_Id='.$reg[0].'&'.$this->prefijo_campo.$accion['nombre'].'=1">'.$accion['texto'].'</a>' ;
 					} 
 					$txt=$txt.'</td>' ;
 					$txt=$txt.'</tr>';
